@@ -1,0 +1,242 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using PregnancyGrowthTracking.BLL.Services.Vnpay;
+using PregnancyGrowthTracking.DAL.DTOs.Vnpay;
+using PregnancyGrowthTracking.DAL.Entities;
+using PregnancyGrowthTracking.DAL;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
+
+namespace PregnancyGrwothTracking.API.Controllers
+{
+
+
+    [ApiController]
+    [Route("api/[controller]")]
+    public class PaymentController : ControllerBase
+    {
+        private readonly IVnPayService _vnPayService;
+        private readonly PregnancyGrowthTrackingDbContext _context;
+        private readonly ILogger<PaymentController> _logger;
+        private readonly IConfiguration _configuration;
+
+
+        public PaymentController(IVnPayService vnPayService,
+            PregnancyGrowthTrackingDbContext context,
+            ILogger<PaymentController> logger,
+            IConfiguration configuration)
+        {
+            _vnPayService = vnPayService;
+            _context = context;
+            _logger = logger;
+            _configuration = configuration;
+        }
+
+        [HttpPost("create-payment")]
+        public async Task<IActionResult> CreatePaymentUrlVnpay([FromBody] PaymentInformationModel model)
+        {
+            try
+            {
+                var membership = await _context.Memberships
+                    .FirstOrDefaultAsync(m => m.MembershipId == model.MembershipId);
+
+                if (membership == null)
+                    return NotFound("Membership not found");
+
+                // Kiểm tra user tồn tại
+                var user = await _context.Users.FindAsync(model.UserId);
+                if (user == null)
+                    return NotFound("User not found");
+
+                _logger.LogInformation($"Creating payment for User {model.UserId}, Membership {model.MembershipId}");
+
+                model.Amount = membership.Price;
+                model.OrderDescription = $"Payment for Membership ID: {model.MembershipId}|UserId: {model.UserId}";  // Thêm UserId vào OrderDescription
+
+                var url = _vnPayService.CreatePaymentUrl(model, HttpContext);
+                return Ok(new { paymentUrl = url });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+
+        [HttpGet("payment-callback")]
+        public async Task<IActionResult> PaymentCallbackVnpay([FromQuery] string vnp_ResponseCode,
+    [FromQuery] string vnp_TxnRef,
+    [FromQuery] string vnp_TransactionNo,
+    [FromQuery] string vnp_OrderInfo)
+        {
+            try
+            {
+                var response = _vnPayService.PaymentExecute(Request.Query);
+                _logger.LogInformation($"VNPay Response: {JsonSerializer.Serialize(response)}");
+
+                if (response.Success)
+                {
+                    _logger.LogInformation($"Processing OrderInfo: {response.OrderDescription}");
+
+                    // Parse từ OrderInfo thay vì TxnRef
+                    string[] parts = response.OrderDescription.Split('|');
+                    if (parts.Length != 2)
+                    {
+                        return BadRequest(new { Success = false, Message = "Invalid order info format" });
+                    }
+
+                    if (!int.TryParse(parts[0], out int membershipId))
+                    {
+                        return BadRequest(new { Success = false, Message = "Invalid membership ID format" });
+                    }
+
+                    if (!int.TryParse(parts[1], out int userId))
+                    {
+                        return BadRequest(new { Success = false, Message = "Invalid user ID format" });
+                    }
+
+                    _logger.LogInformation($"Parsed MembershipId: {membershipId}, UserId: {userId}");
+
+                    var membership = await _context.Memberships.FindAsync(membershipId);
+                    if (membership == null)
+                    {
+                        return BadRequest(new { Success = false, Message = "Membership not found" });
+                    }
+
+                    // Chuyển đổi USD sang VND
+                    const decimal USD_TO_VND_RATE = 24500m;
+                    var vndAmount = membership.Price * USD_TO_VND_RATE;
+                    vndAmount = Math.Round(vndAmount, 0);
+
+                    var payment = new Payment
+                    {
+                        UserId = userId,
+                        MembershipId = membershipId,
+                        Date = DateTime.UtcNow,
+                        TotalPrice = vndAmount
+                    };
+
+                    _context.Payments.Add(payment);
+
+                    var user = await _context.Users.FindAsync(userId);
+                    if (user != null && user.RoleId == 3)
+                    {
+                        user.RoleId = 2;
+                        _context.Users.Update(user);
+                    }
+
+                    await _context.SaveChangesAsync();
+
+                    return Ok(new
+                    {
+                        Success = true,
+                        Message = "Payment processed successfully",
+                        PaymentId = payment.PaymentId,
+                        TransactionId = vnp_TxnRef,
+                        TransactionNo = vnp_TransactionNo,
+                        AmountUSD = membership.Price,
+                        AmountVND = vndAmount,
+                        MembershipId = membershipId,
+                        UserId = userId
+                    });
+                }
+
+                return BadRequest(new
+                {
+                    Success = false,
+                    Message = "Payment failed",
+                    ResponseCode = vnp_ResponseCode,
+                    TransactionNo = vnp_TransactionNo
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error in callback: {ex.Message}, TxnRef: {vnp_TxnRef}");
+                return BadRequest(new
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    ResponseCode = vnp_ResponseCode,
+                    TransactionNo = vnp_TransactionNo
+                });
+            }
+
+
+
+
+
+
+
+
+        }
+
+
+        [HttpGet("user-payments/{userId}")]
+        public async Task<IActionResult> GetUserPayments(int userId)
+        {
+            try
+            {
+                var payments = await _context.Payments
+                    .Where(p => p.UserId == userId)
+                    .Include(p => p.Membership)
+                    .OrderByDescending(p => p.Date)
+                    .Select(p => new
+                    {
+                        p.PaymentId,
+                        p.Date,
+                        p.TotalPrice,
+                        Membership = new
+                        {
+                            p.Membership.MembershipId,
+                            p.Membership.Description,
+                            p.Membership.Price
+                        } 
+                    })
+                    .ToListAsync();
+
+                if (!payments.Any())
+                    return NotFound($"No payments found for user {userId}");
+
+                return Ok(payments);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+
+        [HttpGet("payment/{paymentId}/user/{userId}")]
+        public async Task<IActionResult> GetPayment(int paymentId, int userId)
+        {
+            try
+            {
+                var payment = await _context.Payments
+                    .Include(p => p.Membership)
+                    .FirstOrDefaultAsync(p => p.PaymentId == paymentId && p.UserId == userId);
+
+                if (payment == null)
+                    return NotFound($"Payment {paymentId} not found for user {userId}");
+
+                return Ok(new
+                {
+                    payment.PaymentId,
+                    payment.Date,
+                    payment.TotalPrice,
+                    Membership = new
+                    {
+                        payment.Membership.MembershipId,
+                        payment.Membership.Description,
+                        payment.Membership.Price
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+    }
+}

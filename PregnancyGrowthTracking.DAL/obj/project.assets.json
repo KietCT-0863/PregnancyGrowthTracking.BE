@@ -5208,11 +5208,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking\\Back-End\\PregnancyGrwothTracking\\PregnancyGrowthTracking.DAL\\PregnancyGrowthTracking.DAL.csproj",
+      "projectUniqueName": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.DAL\\PregnancyGrowthTracking.DAL.csproj",
       "projectName": "PregnancyGrowthTracking.DAL",
-      "projectPath": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking\\Back-End\\PregnancyGrwothTracking\\PregnancyGrowthTracking.DAL\\PregnancyGrowthTracking.DAL.csproj",
+      "projectPath": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.DAL\\PregnancyGrowthTracking.DAL.csproj",
       "packagesPath": "C:\\Users\\kietv\\.nuget\\packages\\",
-      "outputPath": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking\\Back-End\\PregnancyGrwothTracking\\PregnancyGrowthTracking.DAL\\obj\\",
+      "outputPath": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.DAL\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\kietv\\AppData\\Roaming\\NuGet\\NuGet.Config",

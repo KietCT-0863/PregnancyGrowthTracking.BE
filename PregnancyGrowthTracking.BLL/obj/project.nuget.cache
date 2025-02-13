@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "J0WPbdeHEN2B5Q3//uPyDQIqnQwrDSWHVtN0JCUVhYE96wW7cLkVuaOxKKxNnxRzjpWrJ/HYV7iEbAWjaIHvMQ==",
+  "dgSpecHash": "z/JKm4QfkPdRbPozfrRZKHUdF6QEongBbPf9nJ6xJ4UTIAB0SJH0CJoYC0S3b81CnuLuL1PY7FC8Ypo4QTn57A==",
   "success": true,
-  "projectFilePath": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking\\Back-End\\PregnancyGrwothTracking\\PregnancyGrowthTracking.BLL\\PregnancyGrowthTracking.BLL.csproj",
+  "projectFilePath": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.BLL\\PregnancyGrowthTracking.BLL.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\kietv\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\kietv\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",

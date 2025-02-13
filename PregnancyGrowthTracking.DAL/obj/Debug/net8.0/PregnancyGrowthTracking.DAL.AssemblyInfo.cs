@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PregnancyGrowthTracking.DAL")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+eb6791a116f1df2d382948b86eb3d20e3f502406")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
 [assembly: System.Reflection.AssemblyProductAttribute("PregnancyGrowthTracking.DAL")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PregnancyGrowthTracking.DAL")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -122,12 +122,9 @@ namespace PregnancyGrwothTracking.API
 
             var app = builder.Build();
 
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage(); //  Hiển thị lỗi chi tiết khi chạy API
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+            app.UseDeveloperExceptionPage(); //  Hiển thị lỗi chi tiết khi chạy API
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
 

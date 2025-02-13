@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking\\Back-End\\PregnancyGrwothTracking\\PregnancyGrwothTracking.API\\PregnancyGrwothTracking.API.csproj": {}
+    "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrwothTracking.API\\PregnancyGrwothTracking.API.csproj": {}
   },
   "projects": {
-    "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking\\Back-End\\PregnancyGrwothTracking\\PregnancyGrowthTracking.BLL\\PregnancyGrowthTracking.BLL.csproj": {
+    "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.BLL\\PregnancyGrowthTracking.BLL.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking\\Back-End\\PregnancyGrwothTracking\\PregnancyGrowthTracking.BLL\\PregnancyGrowthTracking.BLL.csproj",
+        "projectUniqueName": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.BLL\\PregnancyGrowthTracking.BLL.csproj",
         "projectName": "PregnancyGrowthTracking.BLL",
-        "projectPath": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking\\Back-End\\PregnancyGrwothTracking\\PregnancyGrowthTracking.BLL\\PregnancyGrowthTracking.BLL.csproj",
+        "projectPath": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.BLL\\PregnancyGrowthTracking.BLL.csproj",
         "packagesPath": "C:\\Users\\kietv\\.nuget\\packages\\",
-        "outputPath": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking\\Back-End\\PregnancyGrwothTracking\\PregnancyGrowthTracking.BLL\\obj\\",
+        "outputPath": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.BLL\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\kietv\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -28,8 +28,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking\\Back-End\\PregnancyGrwothTracking\\PregnancyGrowthTracking.DAL\\PregnancyGrowthTracking.DAL.csproj": {
-                "projectPath": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking\\Back-End\\PregnancyGrwothTracking\\PregnancyGrowthTracking.DAL\\PregnancyGrowthTracking.DAL.csproj"
+              "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.DAL\\PregnancyGrowthTracking.DAL.csproj": {
+                "projectPath": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.DAL\\PregnancyGrowthTracking.DAL.csproj"
               }
             }
           }
@@ -69,14 +69,14 @@
         }
       }
     },
-    "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking\\Back-End\\PregnancyGrwothTracking\\PregnancyGrowthTracking.DAL\\PregnancyGrowthTracking.DAL.csproj": {
+    "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.DAL\\PregnancyGrowthTracking.DAL.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking\\Back-End\\PregnancyGrwothTracking\\PregnancyGrowthTracking.DAL\\PregnancyGrowthTracking.DAL.csproj",
+        "projectUniqueName": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.DAL\\PregnancyGrowthTracking.DAL.csproj",
         "projectName": "PregnancyGrowthTracking.DAL",
-        "projectPath": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking\\Back-End\\PregnancyGrwothTracking\\PregnancyGrowthTracking.DAL\\PregnancyGrowthTracking.DAL.csproj",
+        "projectPath": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.DAL\\PregnancyGrowthTracking.DAL.csproj",
         "packagesPath": "C:\\Users\\kietv\\.nuget\\packages\\",
-        "outputPath": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking\\Back-End\\PregnancyGrwothTracking\\PregnancyGrowthTracking.DAL\\obj\\",
+        "outputPath": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.DAL\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\kietv\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -158,14 +158,14 @@
         }
       }
     },
-    "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking\\Back-End\\PregnancyGrwothTracking\\PregnancyGrwothTracking.API\\PregnancyGrwothTracking.API.csproj": {
+    "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrwothTracking.API\\PregnancyGrwothTracking.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking\\Back-End\\PregnancyGrwothTracking\\PregnancyGrwothTracking.API\\PregnancyGrwothTracking.API.csproj",
+        "projectUniqueName": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrwothTracking.API\\PregnancyGrwothTracking.API.csproj",
         "projectName": "PregnancyGrwothTracking.API",
-        "projectPath": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking\\Back-End\\PregnancyGrwothTracking\\PregnancyGrwothTracking.API\\PregnancyGrwothTracking.API.csproj",
+        "projectPath": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrwothTracking.API\\PregnancyGrwothTracking.API.csproj",
         "packagesPath": "C:\\Users\\kietv\\.nuget\\packages\\",
-        "outputPath": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking\\Back-End\\PregnancyGrwothTracking\\PregnancyGrwothTracking.API\\obj\\",
+        "outputPath": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrwothTracking.API\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\kietv\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -182,11 +182,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking\\Back-End\\PregnancyGrwothTracking\\PregnancyGrowthTracking.BLL\\PregnancyGrowthTracking.BLL.csproj": {
-                "projectPath": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking\\Back-End\\PregnancyGrwothTracking\\PregnancyGrowthTracking.BLL\\PregnancyGrowthTracking.BLL.csproj"
+              "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.BLL\\PregnancyGrowthTracking.BLL.csproj": {
+                "projectPath": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.BLL\\PregnancyGrowthTracking.BLL.csproj"
               },
-              "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking\\Back-End\\PregnancyGrwothTracking\\PregnancyGrowthTracking.DAL\\PregnancyGrowthTracking.DAL.csproj": {
-                "projectPath": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking\\Back-End\\PregnancyGrwothTracking\\PregnancyGrowthTracking.DAL\\PregnancyGrowthTracking.DAL.csproj"
+              "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.DAL\\PregnancyGrowthTracking.DAL.csproj": {
+                "projectPath": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.DAL\\PregnancyGrowthTracking.DAL.csproj"
               }
             }
           }

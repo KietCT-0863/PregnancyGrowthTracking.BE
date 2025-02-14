@@ -23,8 +23,8 @@ namespace PregnancyGrowthTracking.BLL.Services.Vnpay
             var timeZoneById = TimeZoneInfo.FindSystemTimeZoneById(_configuration["TimeZoneId"]);
             var timeNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZoneById);
 
-            // Tạo transactionId đơn giản hơn
-            var transactionId = $"{model.MembershipId}{model.UserId}";
+
+            var transactionId = $"{model.MembershipId}{model.UserId}{DateTime.Now.Ticks}";
             _logger.LogInformation($"Generated TransactionId: {transactionId}");
 
             var pay = new VnPayLibrary();

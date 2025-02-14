@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PregnancyGrowthTracking.BLL")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b093ba99f91dfc6f7aa3fd83f188ea1267dbb250")]
 [assembly: System.Reflection.AssemblyProductAttribute("PregnancyGrowthTracking.BLL")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PregnancyGrowthTracking.BLL")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

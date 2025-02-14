@@ -49,6 +49,10 @@ namespace PregnancyGrwothTracking.API.Controllers
                 var user = await _context.Users.FindAsync(model.UserId);
                 if (user == null)
                     return NotFound("User not found");
+                if (user.RoleId == 1 || user.RoleId == 2)
+                {
+                    return BadRequest(new { message = "Bạn đã là thành viên, không cần thanh toán nữa." });
+                }
 
                 _logger.LogInformation($"Creating payment for User {model.UserId}, Membership {model.MembershipId}");
 

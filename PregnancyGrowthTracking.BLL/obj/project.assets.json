@@ -3509,19 +3509,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\kietv\\.nuget\\packages\\": {}
+    "C:\\Users\\Nhat\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.BLL\\PregnancyGrowthTracking.BLL.csproj",
+      "projectUniqueName": "E:\\Test\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.BLL\\PregnancyGrowthTracking.BLL.csproj",
       "projectName": "PregnancyGrowthTracking.BLL",
-      "projectPath": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.BLL\\PregnancyGrowthTracking.BLL.csproj",
-      "packagesPath": "C:\\Users\\kietv\\.nuget\\packages\\",
-      "outputPath": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.BLL\\obj\\",
+      "projectPath": "E:\\Test\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.BLL\\PregnancyGrowthTracking.BLL.csproj",
+      "packagesPath": "C:\\Users\\Nhat\\.nuget\\packages\\",
+      "outputPath": "E:\\Test\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.BLL\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\kietv\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Nhat\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -3535,8 +3540,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.DAL\\PregnancyGrowthTracking.DAL.csproj": {
-              "projectPath": "D:\\FPT\\KI_5\\SWP391\\Project\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.DAL\\PregnancyGrowthTracking.DAL.csproj"
+            "E:\\Test\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.DAL\\PregnancyGrowthTracking.DAL.csproj": {
+              "projectPath": "E:\\Test\\PregnancyGrowthTracking.BE\\PregnancyGrowthTracking.DAL\\PregnancyGrowthTracking.DAL.csproj"
             }
           }
         }
@@ -3545,7 +3550,13 @@
         "warnAsError": [
           "NU1605"
         ]
-      }
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "9.0.100"
     },
     "frameworks": {
       "net8.0": {
@@ -3572,7 +3583,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.103/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

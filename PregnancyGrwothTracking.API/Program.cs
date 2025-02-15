@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
@@ -94,7 +93,7 @@ namespace PregnancyGrwothTracking.API
                     builder =>
                     {
                         builder
-                            .AllowAnyOrigin()
+                            .WithOrigins("https://your-azure-app-url.azurewebsites.net")
                             .AllowAnyMethod()
                             .AllowAnyHeader();
                     });
@@ -122,9 +121,29 @@ namespace PregnancyGrwothTracking.API
 
             var app = builder.Build();
 
-            app.UseDeveloperExceptionPage(); //  Hiển thị lỗi chi tiết khi chạy API
-            app.UseSwagger();
-            app.UseSwaggerUI();
+            // Thay đổi phần này
+            // Chỉ sử dụng Swagger trong môi trường Development và Staging
+            if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
+            {
+                app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Pregnancy Growth Tracking API V1");
+                    // Đặt Swagger là trang mặc định
+                    c.RoutePrefix = string.Empty;
+                });
+            }
+            else 
+            {
+                // Trong môi trường Production
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Pregnancy Growth Tracking API V1");
+                    c.RoutePrefix = string.Empty;
+                });
+            }
 
             app.UseHttpsRedirection();
 

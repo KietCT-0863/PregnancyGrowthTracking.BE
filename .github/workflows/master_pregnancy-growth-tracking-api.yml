@@ -27,11 +27,7 @@ jobs:
         run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp --self-contained true
-        working-directory: ./PregnancyGrwothTracking.API
-
-      - name: List publish contents
-        run: ls -la ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -58,9 +54,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_16DDAF72FAA44DC9A4D5D9DADD79C932 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_A6E280A22F884A4DBD62D4D234537110 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_95B3FB77C6054A739F82557794E7662A }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_6B94F4C3CB7E449093830C5D4DBD0014 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_610B85154BDD49D4843178890E59B806 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_0D93438E177145BD97A51F6C62986580 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp

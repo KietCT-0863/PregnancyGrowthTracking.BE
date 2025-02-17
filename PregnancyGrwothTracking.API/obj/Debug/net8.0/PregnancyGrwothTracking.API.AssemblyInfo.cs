@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PregnancyGrwothTracking.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4564590743f2eba8267c2ede823991ee7a1ec28e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8837b9f721bc433242a7d870540fa8a6f6f59d8d")]
 [assembly: System.Reflection.AssemblyProductAttribute("PregnancyGrwothTracking.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PregnancyGrwothTracking.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1234,7 +1234,10 @@
           "PregnancyGrowthTracking.DAL": "1.0.0"
         },
         "runtime": {
-          "PregnancyGrowthTracking.BLL.dll": {}
+          "PregnancyGrowthTracking.BLL.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       },
       "PregnancyGrowthTracking.DAL/1.0.0": {
@@ -1246,7 +1249,10 @@
           "Microsoft.Extensions.Configuration.Json": "9.0.1"
         },
         "runtime": {
-          "PregnancyGrowthTracking.DAL.dll": {}
+          "PregnancyGrowthTracking.DAL.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       }
     }

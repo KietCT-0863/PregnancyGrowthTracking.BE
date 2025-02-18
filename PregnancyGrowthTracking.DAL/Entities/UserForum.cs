@@ -13,6 +13,10 @@ public partial class UserForum
 
     public DateOnly? Date { get; set; }
 
+    public int? TagId { get; set; }
+
+    public virtual ForumTag? Tag { get; set; }
+
     public virtual User? User { get; set; }
 
     public virtual ICollection<UserComment> UserComments { get; set; } = new List<UserComment>();

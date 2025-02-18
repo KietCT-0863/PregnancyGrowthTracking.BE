@@ -56,7 +56,9 @@ namespace PregnancyGrwothTracking.API.Controllers
 
                 _logger.LogInformation($"Creating payment for User {model.UserId}, Membership {model.MembershipId}");
 
-                model.Amount = membership.Price;
+                model.Amount = (decimal)(membership.Price ?? 0);
+                // ép kiểu về decimal, vì membership.Price là một nullable nên phải thêm toán ?? để khi giá trị là null sẽ trả về 0
+
                 model.OrderDescription = $"Payment for Membership ID: {model.MembershipId}|UserId: {model.UserId}";  // Thêm UserId vào OrderDescription
 
                 var url = _vnPayService.CreatePaymentUrl(model, HttpContext);
@@ -67,7 +69,6 @@ namespace PregnancyGrwothTracking.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-
 
         [HttpGet("payment-callback")]
         public async Task<IActionResult> PaymentCallbackVnpay([FromQuery] string vnp_ResponseCode,
@@ -111,16 +112,18 @@ namespace PregnancyGrwothTracking.API.Controllers
 
                     // Chuyển đổi USD sang VND
                     const decimal USD_TO_VND_RATE = 24500m;
-                    var vndAmount = membership.Price * USD_TO_VND_RATE;
+                    var vndAmount = (decimal)(membership.Price ?? 0) * USD_TO_VND_RATE; 
+                    // ép kiểu về decimal rồi mới nhân
                     vndAmount = Math.Round(vndAmount, 0);
 
                     var payment = new Payment
                     {
                         UserId = userId,
                         MembershipId = membershipId,
-                        Date = DateTime.UtcNow,
-                        TotalPrice = vndAmount
+                        Date = DateOnly.FromDateTime(DateTime.UtcNow), // ép kiểu về DateOnly
+                        TotalPrice = (double)vndAmount // ép kiểu về double
                     };
+
 
                     _context.Payments.Add(payment);
 

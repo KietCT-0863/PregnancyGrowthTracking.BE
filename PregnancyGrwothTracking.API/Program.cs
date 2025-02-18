@@ -5,6 +5,7 @@ using Microsoft.OpenApi.Models;
 using PregnancyGrowthTracking.BLL.Services;
 using PregnancyGrowthTracking.BLL.Services.Vnpay;
 using PregnancyGrowthTracking.DAL;
+using PregnancyGrowthTracking.DAL.Entities;
 using PregnancyGrowthTracking.DAL.Repositories;
 
 namespace PregnancyGrwothTracking.API

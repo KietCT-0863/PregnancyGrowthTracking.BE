@@ -9,7 +9,7 @@ public partial class Foetu
 
     public int? UserId { get; set; }
 
-    public virtual ICollection<GrowthCheck> GrowthChecks { get; set; } = new List<GrowthCheck>();
+    public virtual ICollection<GrowthDatum> GrowthData { get; set; } = new List<GrowthDatum>();
 
     public virtual User? User { get; set; }
 }

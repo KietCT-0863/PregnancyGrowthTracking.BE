@@ -23,7 +23,7 @@ public partial class User
 
     public int? RoleId { get; set; }
 
-    public string? UserImage { get; set; }
+    public string? ProfileImageUrl { get; set; }
 
     public virtual ICollection<Foetu> Foetus { get; set; } = new List<Foetu>();
 

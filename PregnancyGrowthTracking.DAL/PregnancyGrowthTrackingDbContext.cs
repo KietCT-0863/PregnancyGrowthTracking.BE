@@ -242,7 +242,7 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
             entity.Property(e => e.FullName).HasMaxLength(100);
             entity.Property(e => e.Password).HasMaxLength(50);
             entity.Property(e => e.Phone).HasMaxLength(15);
-            entity.Property(e => e.UserImage).HasMaxLength(255);
+            entity.Property(e => e.ProfileImageUrl).HasMaxLength(255);
             entity.Property(e => e.UserName).HasMaxLength(50);
 
             entity.HasOne(d => d.Role).WithMany(p => p.Users)

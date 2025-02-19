@@ -218,7 +218,7 @@ CREATE TABLE [dbo].[User](
 	[Phone] [nvarchar](15) NULL,
 	[Available] [bit] NULL,
 	[RoleId] [int] NULL,
-	[UserImage] [nvarchar](255) NULL,
+	[ProfileImageUrl] [nvarchar](255) NULL,
 PRIMARY KEY CLUSTERED 
 (
 	[UserId] ASC

@@ -9,7 +9,7 @@ VALUES
 ('member'),
 ('guest');
 
-INSERT INTO [User] (UserName, FullName, Email, Password, DOB, Phone, Available, RoleId, UserImage)
+INSERT INTO [User] (UserName, FullName, Email, Password, DOB, Phone, Available, RoleId, ProfileImageUrl)
 VALUES
 -- Admin
 ('admin_user', 'Admin User', 'admin@example.com', 'admin123', '1980-01-01', '0123456789', 1, 1, null),

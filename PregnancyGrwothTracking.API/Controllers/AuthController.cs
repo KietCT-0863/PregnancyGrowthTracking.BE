@@ -47,5 +47,19 @@ namespace PregnancyGrowthTracking.API.Controllers
                 return Unauthorized("Invalid username/email or password.");
             }
         }
+        //login with google
+        [HttpPost("signin-google")]
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequestDto request)
+        {
+            try
+            {
+                var response = await _authService.LoginWithGoogleAsync(request.IdToken);
+                return Ok(response);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+        }
     }
 }

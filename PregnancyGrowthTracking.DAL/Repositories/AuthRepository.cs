@@ -1,6 +1,8 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -15,10 +17,12 @@ public class AuthRepository : IAuthRepository
 {
     private readonly PregnancyGrowthTrackingDbContext _dbContext;
     private readonly IConfiguration _configuration;
+    private readonly HttpClient _httpClient;
     public AuthRepository(PregnancyGrowthTrackingDbContext dbContext, IConfiguration configuration)
     {
         _dbContext = dbContext;
         _configuration = configuration;
+        _httpClient = new HttpClient();
     }
 
     public async Task<RegisterResponseDto> RegisterAsync(RegisterRequestDto request)
@@ -133,6 +137,95 @@ public class AuthRepository : IAuthRepository
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    //Login with google
+    public async Task<LoginResponseDto> LoginWithGoogleAsync(string idToken)
+    {
+        var googleClientId = _configuration["Authentication:Google:ClientId"];
+        var googleTokenValidationUrl = $"https://oauth2.googleapis.com/tokeninfo?id_token={idToken}";
+
+        // Gửi yêu cầu đến Google để xác minh ID Token
+        var response = await _httpClient.GetAsync(googleTokenValidationUrl);
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new UnauthorizedAccessException("Invalid Google ID Token.");
+        }
+
+        var jsonResponse = await response.Content.ReadAsStringAsync();
+        Console.WriteLine("Google Response: " + jsonResponse); // Debug
+
+        using var jsonDoc = JsonDocument.Parse(jsonResponse);
+        var root = jsonDoc.RootElement;
+
+        var email = root.TryGetProperty("email", out var emailProp) ? emailProp.GetString() : null;
+        var aud = root.TryGetProperty("aud", out var audProp) ? audProp.GetString() : null;
+
+        Console.WriteLine($"Received AUD: {aud}"); // Debug kiểm tra Client ID từ Google
+
+        if (string.IsNullOrEmpty(email))
+        {
+            throw new UnauthorizedAccessException("Google login failed: Missing email.");
+        }
+
+        if (aud != googleClientId)
+        {
+            throw new UnauthorizedAccessException($"Invalid Google Client ID. Received: {aud}, Expected: {googleClientId}");
+        }
+
+        //  Gọi API để lấy ảnh đại diện từ Google
+        var googleUserInfoUrl = "https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=" + idToken;
+        var userInfoResponse = await _httpClient.GetAsync(googleUserInfoUrl);
+
+        string profileImageUrl = null;
+        if (userInfoResponse.IsSuccessStatusCode)
+        {
+            var userInfoJson = await userInfoResponse.Content.ReadAsStringAsync();
+            using var userInfoDoc = JsonDocument.Parse(userInfoJson);
+            profileImageUrl = userInfoDoc.RootElement.TryGetProperty("picture", out var pictureProp) ? pictureProp.GetString() : null;
+        }
+
+        // Kiểm tra user trong database
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
+
+        if (user == null)
+        {
+            // Nếu user chưa có trong database, tạo tài khoản mới
+            user = new User
+            {
+                UserName = email.Split('@')[0],
+                FullName = root.TryGetProperty("name", out var nameProp) ? nameProp.GetString() : "Google User",
+                Email = email,
+                Password = "",
+                RoleId = 3,
+                Available = true,
+                ProfileImageUrl = profileImageUrl // Lưu ảnh vào database
+            };
+
+            await _dbContext.Users.AddAsync(user);
+            await _dbContext.SaveChangesAsync();
+        }
+        else
+        {
+            // Cập nhật ảnh nếu chưa có hoặc khác ảnh cũ
+            if (string.IsNullOrEmpty(user.ProfileImageUrl) || user.ProfileImageUrl != profileImageUrl)
+            {
+                user.ProfileImageUrl = profileImageUrl;
+                _dbContext.Users.Update(user);
+                await _dbContext.SaveChangesAsync();
+            }
+        }
+
+        string token = GenerateJwtToken(user);
+
+        return new LoginResponseDto
+        {
+            Token = token,
+            UserName = user.UserName,
+            Email = user.Email,
+            Role = "Guest",
+            ProfileImageUrl = user.ProfileImageUrl
+        };
     }
 
 }

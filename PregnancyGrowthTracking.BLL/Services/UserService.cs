@@ -96,5 +96,22 @@ namespace PregnancyGrowthTracking.BLL.Services
         {
             return await _userRepository.DeleteUserAsync(id);
         }
+
+        public async Task<bool> UpdateUserProfileImageAsync(int userId, string imageUrl)
+        {
+            return await _userRepository.UpdateUserProfileImageAsync(userId, imageUrl);
+        }
+
+        public async Task<string?> GetUserProfileImageAsync(int userId)
+        {
+            // ✅ Gọi repository để lấy URL ảnh
+            return await _userRepository.GetUserProfileImageAsync(userId);
+        }
+
+        public async Task<bool> DeleteUserProfileImageAsync(int userId)
+        {
+            // ✅ Gọi tới repository
+            return await _userRepository.DeleteUserProfileImageAsync(userId);
+        }
     }
 }

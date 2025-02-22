@@ -169,16 +169,7 @@ namespace PregnancyGrwothTracking.API.Controllers
                     TransactionNo = vnp_TransactionNo
                 });
             }
-
-
-
-
-
-
-
-
         }
-
 
         [HttpGet("user-payments/{userId}")]
         public async Task<IActionResult> GetUserPayments(int userId)
@@ -213,7 +204,6 @@ namespace PregnancyGrwothTracking.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-
 
         [HttpGet("payment/{paymentId}/user/{userId}")]
         public async Task<IActionResult> GetPayment(int paymentId, int userId)

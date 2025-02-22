@@ -1,12 +1,19 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using PregnancyGrowthTracking.BLL.Services;
 using PregnancyGrowthTracking.BLL.Services.Vnpay;
 using PregnancyGrowthTracking.DAL;
-using PregnancyGrowthTracking.DAL.Entities;
 using PregnancyGrowthTracking.DAL.Repositories;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Configuration;
+using Amazon.S3;
+using Amazon;
+using PregnancyGrowthTracking.DAL.Entities;
+
 
 namespace PregnancyGrwothTracking.API
 {
@@ -33,6 +40,15 @@ namespace PregnancyGrwothTracking.API
                         ClockSkew = TimeSpan.Zero
 
                     };
+                })
+                .AddGoogle(googleOptions =>
+                {
+                    googleOptions.ClientId = builder.Configuration.GetValue<string>("Authentication:Google:ClientId");
+                    googleOptions.ClientSecret = builder.Configuration.GetValue<string>("Authentication:Google:ClientSecret");
+                    googleOptions.CallbackPath = "/signin-google";
+                    googleOptions.Scope.Add("email");
+                    googleOptions.Scope.Add("profile");
+                    googleOptions.SaveTokens = true;
                 });
 
             //  Kích hoạt Authorization
@@ -84,10 +100,10 @@ namespace PregnancyGrwothTracking.API
             });
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserService, UserService>();
-
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
             builder.Services.AddScoped<IAuthService, AuthService>();
-
+            builder.Services.AddSingleton<IS3Repository, S3Repository>();
+            builder.Services.AddSingleton<IS3Service, S3Service>();
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll",
@@ -100,8 +116,17 @@ namespace PregnancyGrwothTracking.API
                     });
             });
 
-
-
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    builder =>
+                    {
+                        builder
+                            .AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader();
+                    });
+            });
             builder.Services.AddDbContext<PregnancyGrowthTrackingDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionStringDB")));
             builder.Services.AddControllers()
@@ -111,14 +136,26 @@ namespace PregnancyGrwothTracking.API
         options.JsonSerializerOptions.WriteIndented = true;
     });
 
+            // ✅ Đọc cấu hình từ appsettings.json
+            var awsOptions = builder.Configuration.GetSection("AWS");
+
+            // ✅ Đăng ký IAmazonS3 bằng Factory
+            builder.Services.AddSingleton<IAmazonS3>(sp =>
+            {
+                var config = sp.GetRequiredService<IConfiguration>();
+                return new AmazonS3Client(
+                    config["AWS:AccessKey"],
+                    config["AWS:SecretKey"],
+                    Amazon.RegionEndpoint.GetBySystemName(config["AWS:Region"])
+                );
+            });
+
             builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         // Cấu hình để xử lý decimal đúng cách
         options.JsonSerializerOptions.NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString;
     });
-
-
 
             var app = builder.Build();
 

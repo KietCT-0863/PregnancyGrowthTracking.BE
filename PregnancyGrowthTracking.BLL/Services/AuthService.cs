@@ -22,5 +22,10 @@ namespace PregnancyGrowthTracking.BLL.Services
         {
             return await _authRepository.LoginAsync(request);
         }
+
+        public async Task<LoginResponseDto> LoginWithGoogleAsync(string idToken)
+        {
+            return await _authRepository.LoginWithGoogleAsync(idToken);
+        }
     }
 }

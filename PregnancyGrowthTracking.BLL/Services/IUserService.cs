@@ -11,5 +11,8 @@ namespace PregnancyGrowthTracking.BLL.Services
         Task<UserResponseDto> CreateUserAsync(UserCreateDto request);
         Task<bool> UpdateUserAsync(int id, UserUpdateDto request);
         Task<bool> DeleteUserAsync(int id);
+        Task<bool> UpdateUserProfileImageAsync(int userId, string imageUrl);
+        Task<string?> GetUserProfileImageAsync(int userId);
+        Task<bool> DeleteUserProfileImageAsync(int userId);
     }
 }

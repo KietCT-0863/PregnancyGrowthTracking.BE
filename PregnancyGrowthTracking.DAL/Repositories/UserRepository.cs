@@ -50,5 +50,38 @@ namespace PregnancyGrowthTracking.DAL.Repositories
         {
             return await _dbContext.Users.AnyAsync(u => u.UserName == userName);
         }
+
+        public async Task<bool> UpdateUserProfileImageAsync(int userId, string imageUrl)
+        {
+            var user = await _dbContext.Users.FindAsync(userId);
+            if (user == null) return false;
+
+            user.ProfileImageUrl = imageUrl;
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<string?> GetUserProfileImageAsync(int userId)
+        {
+            // ✅ Lấy URL ảnh từ cột ProfileImageUrl
+            var user = await _dbContext.Users
+                .Where(u => u.UserId == userId)
+                .Select(u => u.ProfileImageUrl)
+                .FirstOrDefaultAsync();
+
+            return user;
+        }
+
+        public async Task<bool> DeleteUserProfileImageAsync(int userId)
+        {
+            var user = await _dbContext.Users.FindAsync(userId);
+            if (user == null) return false;
+
+            // ✅ Xóa URL trong ProfileImageUrl
+            user.ProfileImageUrl = null;
+
+            var result = await _dbContext.SaveChangesAsync();
+            return result > 0;
+        }
     }
 }

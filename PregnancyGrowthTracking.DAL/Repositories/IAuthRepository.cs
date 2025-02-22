@@ -7,5 +7,6 @@ namespace PregnancyGrowthTracking.DAL.Repositories
     {
         Task<RegisterResponseDto> RegisterAsync(RegisterRequestDto request);
         Task<LoginResponseDto> LoginAsync(LoginRequestDto request);
+        Task<LoginResponseDto> LoginWithGoogleAsync(string idToken);
     }
 }

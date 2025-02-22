@@ -132,8 +132,9 @@ namespace PregnancyGrwothTracking.API
             builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles; 
         options.JsonSerializerOptions.WriteIndented = true;
+        options.JsonSerializerOptions.NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString;
     });
 
             // ✅ Đọc cấu hình từ appsettings.json
@@ -150,12 +151,7 @@ namespace PregnancyGrwothTracking.API
                 );
             });
 
-            builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        // Cấu hình để xử lý decimal đúng cách
-        options.JsonSerializerOptions.NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString;
-    });
+            
 
             var app = builder.Build();
 

@@ -127,8 +127,10 @@ namespace PregnancyGrwothTracking.API
                             .AllowAnyHeader();
                     });
             });
+
             builder.Services.AddDbContext<PregnancyGrowthTrackingDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionStringDB")));
+
             builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -151,7 +153,8 @@ namespace PregnancyGrwothTracking.API
                 );
             });
 
-            
+            // khai báo GrowthStandard
+            builder.Services.AddScoped<IGrowthStandardServices, GrowthStandardServices>();
 
             var app = builder.Build();
 

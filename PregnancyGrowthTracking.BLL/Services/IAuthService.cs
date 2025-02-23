@@ -8,6 +8,7 @@ namespace PregnancyGrowthTracking.BLL.Services
         Task<LoginResponseDto> LoginAsync(LoginRequestDto request);
 
         Task<RegisterResponseDto> RegisterAsync(RegisterRequestDto request);
+
         Task<LoginResponseDto> LoginWithGoogleAsync(string idToken);
     }
 }

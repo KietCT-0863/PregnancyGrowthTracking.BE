@@ -1,4 +1,5 @@
-﻿using PregnancyGrowthTracking.DAL.Entities;
+﻿using PregnancyGrowthTracking.DAL.DTOs;
+using PregnancyGrowthTracking.DAL.Entities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,8 +13,8 @@ namespace PregnancyGrowthTracking.BLL.Services
     {
         Task<List<GrowthStandard>> GetGrowthStandardsAsync();
 
-        void AddGrowthStandardAsync(GrowthStandard newGrowthStandard);
+        Task AddGrowthStandardAsync(GrowthStandardDTO growthStandard);
 
-        void UpdateGrowthStandarddAsync(GrowthStandard growthStandard);
+        Task UpdateGrowthStandardAsync(GrowthStandardUpdateDTO growthStandard);
     }
 }

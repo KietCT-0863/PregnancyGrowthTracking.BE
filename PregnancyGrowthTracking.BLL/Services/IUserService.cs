@@ -1,4 +1,5 @@
 ﻿using PregnancyGrowthTracking.DAL.DTOs;
+using PregnancyGrowthTracking.DAL.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -14,5 +15,6 @@ namespace PregnancyGrowthTracking.BLL.Services
         Task<bool> UpdateUserProfileImageAsync(int userId, string imageUrl);
         Task<string?> GetUserProfileImageAsync(int userId);
         Task<bool> DeleteUserProfileImageAsync(int userId);
+        Task<IEnumerable<UserResponseDto>> SearchUsersByKeywordAsync(string keyword);
     }
 }

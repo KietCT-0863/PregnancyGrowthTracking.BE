@@ -3,6 +3,7 @@ using PregnancyGrowthTracking.DAL.Entities;
 using PregnancyGrowthTracking.DAL.Repositories;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace PregnancyGrowthTracking.BLL.Services
@@ -20,14 +21,22 @@ namespace PregnancyGrowthTracking.BLL.Services
         public async Task<IEnumerable<UserResponseDto>> GetAllUsersAsync()
         {
             var users = await _userRepository.GetAllUsersAsync();
+
             return users.Select(u => new UserResponseDto
             {
                 UserId = u.UserId,
                 UserName = u.UserName,
                 FullName = u.FullName,
-                Email = u.Email
+                Email = u.Email,
+                Phone = u.Phone,
+                ProfileImageUrl = u.ProfileImageUrl,
+                Dob = u.Dob,
+                Available = u.Available ?? false,  
+                RoleId = u.RoleId ?? 0,            
+                Role = u.Role?.Role1               
             }).ToList();
         }
+
 
         //  Lấy User theo ID
         public async Task<UserResponseDto?> GetUserByIdAsync(int id)
@@ -38,7 +47,13 @@ namespace PregnancyGrowthTracking.BLL.Services
                 UserId = user.UserId,
                 UserName = user.UserName,
                 FullName = user.FullName,
-                Email = user.Email
+                Email = user.Email,
+                Phone = user.Phone,
+                ProfileImageUrl = user.ProfileImageUrl,
+                Dob = user.Dob,
+                Available = user.Available ?? false,
+                RoleId = user.RoleId ?? 0,
+                Role = user.Role?.Role1
             };
         }
 
@@ -104,14 +119,39 @@ namespace PregnancyGrowthTracking.BLL.Services
 
         public async Task<string?> GetUserProfileImageAsync(int userId)
         {
-            // ✅ Gọi repository để lấy URL ảnh
+            //  Gọi repository để lấy URL ảnh
             return await _userRepository.GetUserProfileImageAsync(userId);
         }
 
         public async Task<bool> DeleteUserProfileImageAsync(int userId)
         {
-            // ✅ Gọi tới repository
+            //  Gọi tới repository
             return await _userRepository.DeleteUserProfileImageAsync(userId);
         }
+
+        public async Task<IEnumerable<UserResponseDto>> SearchUsersByKeywordAsync(string keyword)
+        {
+            if (string.IsNullOrWhiteSpace(keyword)) return new List<UserResponseDto>();
+
+            // Loại bỏ số và ký tự đặc biệt, chỉ giữ lại chữ cái và khoảng trắng
+            keyword = Regex.Replace(keyword, "[^a-zA-Z\\s]", "").Trim();
+
+            var users = await _userRepository.SearchUsersByKeywordAsync(keyword);
+
+            return users.Select(u => new UserResponseDto
+            {
+                UserId = u.UserId,
+                UserName = u.UserName,
+                FullName = u.FullName,
+                Email = u.Email,
+                Phone = u.Phone,
+                ProfileImageUrl = u.ProfileImageUrl,
+                Dob = u.Dob,
+                Available = u.Available ?? false,  
+                RoleId = u.RoleId ?? 0,
+                Role = u.Role?.Role1  
+            }).ToList();
+        }
+
     }
 }

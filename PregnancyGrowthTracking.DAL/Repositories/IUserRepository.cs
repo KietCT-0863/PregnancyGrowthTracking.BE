@@ -15,5 +15,6 @@ namespace PregnancyGrowthTracking.DAL.Repositories
         Task<bool> UpdateUserProfileImageAsync(int userId, string imageUrl);
         Task<string?> GetUserProfileImageAsync(int userId);
         Task<bool> DeleteUserProfileImageAsync(int userId);
+        Task<IEnumerable<User>> SearchUsersByKeywordAsync(string keyword);
     }
 }

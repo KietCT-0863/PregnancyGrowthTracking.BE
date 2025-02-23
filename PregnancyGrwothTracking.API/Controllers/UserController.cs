@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PregnancyGrowthTracking.BLL.Services;
 using PregnancyGrowthTracking.DAL.DTOs;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace PregnancyGrowthTracking.API.Controllers
@@ -82,5 +83,29 @@ namespace PregnancyGrowthTracking.API.Controllers
             var deleted = await _userService.DeleteUserAsync(id);
             return deleted ? Ok(new { Message = "User deleted successfully" }) : NotFound(new { Message = "User not found" });
         }
+
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<UserResponseDto>>> SearchUsers([FromQuery] string fullNameOrKeyword)
+        {
+            //  Kiểm tra dữ liệu đầu vào có rỗng hoặc null không
+            if (string.IsNullOrWhiteSpace(fullNameOrKeyword))
+                return BadRequest(new { Message = "Please enter search keywords." });
+
+            //  Kiểm tra nếu từ khóa có chứa số hoặc ký tự đặc biệt
+            if (!Regex.IsMatch(fullNameOrKeyword, @"^[a-zA-Z\s]+$"))
+                return BadRequest(new { Message = "Search for keywords that do not contain numbers or special characters." });
+
+            var users = await _userService.SearchUsersByKeywordAsync(fullNameOrKeyword);
+
+            //  Kiểm tra nếu không tìm thấy người dùng nào
+            if (users == null || !users.Any())
+                return NotFound(new { Message = "User not found." });
+
+            return Ok(users);
+        }
+
+
+
+
     }
 }

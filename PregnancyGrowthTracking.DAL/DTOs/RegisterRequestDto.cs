@@ -21,8 +21,11 @@ namespace PregnancyGrowthTracking.DAL.DTOs
         public string Password { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Họ và tên là bắt buộc.")]
+        [MinLength(4, ErrorMessage = "Họ và tên phải có ít nhất 4 ký tự.")]
         [MaxLength(50, ErrorMessage = "Họ và tên không được quá 50 ký tự.")]
+        [RegularExpression(@"^[a-zA-ZÀ-ỹ\s]+$", ErrorMessage = "Họ và tên chỉ được chứa chữ cái và khoảng trắng, không chứa số hoặc ký tự đặc biệt.")]
         public string FullName { get; set; } = string.Empty;
+
 
         [Required(ErrorMessage = "Ngày sinh là bắt buộc.")]
         public DateOnly Dob { get; set; }

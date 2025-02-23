@@ -49,6 +49,15 @@ public class AuthRepository : IAuthRepository
                 Success = false
             };
         }
+        if (request.Dob != default && !Regex.IsMatch(request.Dob.ToString("yyyy/MM/dd"), @"^\d{4}/\d{2}/\d{2}$"))
+        {
+            return new RegisterResponseDto
+            {
+                Message = "Ngày sinh không đúng định dạng YYYY/MM/DD.",
+                Success = false
+            };
+        }
+
 
         //  Kiểm tra độ mạnh của mật khẩu
         if (!Regex.IsMatch(request.Password, @"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$"))
@@ -69,7 +78,7 @@ public class AuthRepository : IAuthRepository
             Password = request.Password, // Không hash mật khẩu
             Dob = request.Dob,
             Phone = request.Phone,
-            RoleId = 2, // Mặc định là User
+            RoleId = 3, // Mặc định là Guest
             Available = true
         };
 

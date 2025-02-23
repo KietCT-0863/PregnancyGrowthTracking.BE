@@ -16,13 +16,21 @@ namespace PregnancyGrowthTracking.DAL.Repositories
 
         public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
-            return await _dbContext.Users.AsNoTracking().ToListAsync();
+            return await _dbContext.Users
+                .Include(u => u.Role) 
+                .AsNoTracking()
+                .ToListAsync();
         }
+
 
         public async Task<User?> GetUserByIdAsync(int id)
         {
-            return await _dbContext.Users.FindAsync(id);
+            return await _dbContext.Users
+                .Include(u => u.Role) 
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.UserId == id);
         }
+
 
         public async Task<User> CreateUserAsync(User user)
         {
@@ -63,7 +71,7 @@ namespace PregnancyGrowthTracking.DAL.Repositories
 
         public async Task<string?> GetUserProfileImageAsync(int userId)
         {
-            // ✅ Lấy URL ảnh từ cột ProfileImageUrl
+            // Lấy URL ảnh từ cột ProfileImageUrl
             var user = await _dbContext.Users
                 .Where(u => u.UserId == userId)
                 .Select(u => u.ProfileImageUrl)
@@ -77,11 +85,22 @@ namespace PregnancyGrowthTracking.DAL.Repositories
             var user = await _dbContext.Users.FindAsync(userId);
             if (user == null) return false;
 
-            // ✅ Xóa URL trong ProfileImageUrl
+            // Xóa URL trong ProfileImageUrl
             user.ProfileImageUrl = null;
 
             var result = await _dbContext.SaveChangesAsync();
             return result > 0;
         }
+
+        public async Task<IEnumerable<User>> SearchUsersByKeywordAsync(string keyword)
+        {
+            return await _dbContext.Users
+                .Include(u => u.Role)
+                .Where(u => !string.IsNullOrEmpty(u.FullName) &&
+                            EF.Functions.Like(u.FullName, $"%{keyword}%"))
+                .ToListAsync();
+        }
+
+
     }
 }

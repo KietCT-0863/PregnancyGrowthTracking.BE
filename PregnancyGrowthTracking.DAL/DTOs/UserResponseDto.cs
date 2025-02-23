@@ -10,5 +10,7 @@
         public DateOnly? Dob { get; set; }
         public bool Available { get; set; }
         public int RoleId { get; set; }
+        public string Role {  get; set; }
+        public string ProfileImageUrl {  get; set; }
     }
 }

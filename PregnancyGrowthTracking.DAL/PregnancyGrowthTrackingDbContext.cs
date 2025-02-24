@@ -16,7 +16,7 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
     {
     }
 
-    public virtual DbSet<Blog> Blogs { get; set; }
+    public virtual DbSet<Blog> Blog { get; set; }
 
     public virtual DbSet<BlogCate> BlogCates { get; set; }
 
@@ -28,7 +28,7 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
 
     public virtual DbSet<GrowthData> GrowthData { get; set; }
 
-    public virtual DbSet<GrowthStandard> GrowthStandards { get; set; }
+    public virtual DbSet<GrowthStandard> GrowthStandard { get; set; }
 
     public virtual DbSet<Membership> Memberships { get; set; }
 
@@ -78,7 +78,7 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
 
             entity.HasIndex(e => new { e.BlogId, e.CategoryId }, "UQ__BlogCate__F5A70D919D86AEAA").IsUnique();
 
-            entity.HasOne(d => d.Blog).WithMany(p => p.BlogCates)
+            entity.HasOne(d => d.Blog).WithMany(p => p.BlogCate)
                 .HasForeignKey(d => d.BlogId)
                 .HasConstraintName("FK__BlogCate__BlogId__0B91BA14");
 
@@ -93,7 +93,7 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
 
             entity.ToTable("Category");
 
-            entity.Property(e => e.Category1)
+            entity.Property(e => e.CategoryName)
                 .HasMaxLength(255)
                 .HasColumnName("Category");
         });

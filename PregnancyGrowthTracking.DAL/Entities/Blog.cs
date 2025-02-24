@@ -11,5 +11,5 @@ public partial class Blog
 
     public string Body { get; set; } = null!;
 
-    public virtual ICollection<BlogCate> BlogCates { get; set; } = new List<BlogCate>();
+    public virtual ICollection<BlogCate> BlogCate { get; set; } = new List<BlogCate>();
 }

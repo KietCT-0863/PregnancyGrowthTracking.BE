@@ -156,6 +156,10 @@ namespace PregnancyGrwothTracking.API
             // khai báo GrowthStandard
             builder.Services.AddScoped<IGrowthStandardServices, GrowthStandardServices>();
 
+            // khai báo Blog
+            builder.Services.AddScoped<IBlogRepository, BlogRepository>();
+            builder.Services.AddScoped<IBlogService, BlogService>();
+
             var app = builder.Build();
 
             app.UseDeveloperExceptionPage(); //  Hiển thị lỗi chi tiết khi chạy API

@@ -69,7 +69,7 @@ namespace PregnancyGrowthTracking.BLL.Services
                 UserName = request.UserName,
                 FullName = request.FullName,
                 Email = request.Email,
-                Password = request.Password, // Lưu ý: Không hash mật khẩu ở đây
+                Password = request.Password, 
                 Dob = request.Dob,
                 Phone = request.Phone,
                 Available = request.Available,
@@ -88,23 +88,55 @@ namespace PregnancyGrowthTracking.BLL.Services
         }
 
         //  Cập nhật User
-        public async Task<bool> UpdateUserAsync(int id, UserUpdateDto request)
+        public async Task<bool> UpdateUserAsync(int userId, UserUpdateDto request)
         {
-            var user = await _userRepository.GetUserByIdAsync(id);
-            if (user == null) return false;
+            var user = await _userRepository.GetUserByIdAsync(userId);
+            if (user == null)
+                throw new KeyNotFoundException("Không tìm thấy người dùng.");
+            //  Kiểm tra UserName (phải có ít nhất 4 ký tự, không chứa ký tự đặc biệt ngoài "_" và ".")
+            if (!string.IsNullOrWhiteSpace(request.UserName) &&
+                !Regex.IsMatch(request.UserName, @"^(?![_\.])[a-zA-Z0-9._]{4,30}(?<![_\.])$"))
+            {
+                throw new ArgumentException("Username phải có ít nhất 4 ký tự, không chứa ký tự đặc biệt ngoại trừ _ và không được bắt đầu hoặc kết thúc bằng _ hoặc .");
+            }
 
-            // Chỉ cập nhật các trường không null
-            if (!string.IsNullOrEmpty(request.UserName)) user.UserName = request.UserName;
-            if (!string.IsNullOrEmpty(request.FullName)) user.FullName = request.FullName;
-            if (!string.IsNullOrEmpty(request.Email)) user.Email = request.Email;
-            if (!string.IsNullOrEmpty(request.Password)) user.Password = request.Password;
-            if (request.Dob.HasValue) user.Dob = request.Dob;
-            if (!string.IsNullOrEmpty(request.Phone)) user.Phone = request.Phone;
-            if (request.Available.HasValue) user.Available = request.Available;
-            if (request.RoleId.HasValue) user.RoleId = request.RoleId;
+            //  Kiểm tra FullName (không chứa số & ký tự đặc biệt)
+            if (!string.IsNullOrWhiteSpace(request.FullName) && !Regex.IsMatch(request.FullName, @"^[a-zA-Z\s]{2,50}$"))
+                throw new ArgumentException("Họ và tên phải chứa từ 2-50 ký tự, không chứa số hoặc ký tự đặc biệt.");
+
+            //  Kiểm tra Email (nếu có cập nhật)
+            if (!string.IsNullOrWhiteSpace(request.Email) && !Regex.IsMatch(request.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+                throw new ArgumentException("Email không hợp lệ.");
+
+            //  Kiểm tra Password (nếu có cập nhật)
+            if (!string.IsNullOrWhiteSpace(request.Password) && !Regex.IsMatch(request.Password, @"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$"))
+                throw new ArgumentException("Mật khẩu phải có ít nhất 6 ký tự, chứa cả chữ cái và số.");
+
+            //  Kiểm tra Ngày sinh (nếu có cập nhật)
+            if (request.Dob.HasValue && !Regex.IsMatch(request.Dob.Value.ToString("yyyy/MM/dd"), @"^\d{4}/\d{2}/\d{2}$"))
+                throw new ArgumentException("Ngày sinh phải theo định dạng YYYY/MM/DD.");
+
+            // Kiểm tra số điện thoại (nếu có cập nhật)
+            if (!string.IsNullOrWhiteSpace(request.Phone) && !Regex.IsMatch(request.Phone, @"^0\d{9}$"))
+                throw new ArgumentException("Số điện thoại phải có 10 chữ số và bắt đầu bằng 0.");
+
+            //  Kiểm tra RoleId (nếu có cập nhật)
+            if (request.RoleId.HasValue && (request.RoleId < 1 || request.RoleId > 3))
+                throw new ArgumentException("RoleId phải nằm trong khoảng 1-3.");
+
+            //  Cập nhật dữ liệu
+            user.UserName = request.UserName ?? user.UserName;
+            user.FullName = request.FullName ?? user.FullName;
+            user.Email = request.Email ?? user.Email;
+            user.Password = request.Password ?? user.Password;
+            user.Dob = request.Dob ?? user.Dob;
+            user.Phone = request.Phone ?? user.Phone;
+            user.Available = request.Available ?? user.Available;
+            user.RoleId = request.RoleId ?? user.RoleId;
 
             return await _userRepository.UpdateUserAsync(user);
         }
+
 
         //  Xóa User
         public async Task<bool> DeleteUserAsync(int id)

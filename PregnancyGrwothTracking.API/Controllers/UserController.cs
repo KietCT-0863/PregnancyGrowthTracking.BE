@@ -62,18 +62,27 @@ namespace PregnancyGrowthTracking.API.Controllers
 
         //  Update user
         [HttpPut("{id}")]
-        [Authorize(Roles = "admin,member")]
-        
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdateDto request)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                var updated = await _userService.UpdateUserAsync(id, request);
+                return updated ? Ok(new { Message = "Cập nhật người dùng thành công." }) : NotFound("Không tìm thấy người dùng.");
             }
-
-            var updated = await _userService.UpdateUserAsync(id, request);
-            return updated ? Ok(new { Message = "User updated successfully" }) : NotFound(new { Message = "User not found" });
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Lỗi máy chủ nội bộ.", Error = ex.Message });
+            }
         }
+
 
         //  Delete user
         [HttpDelete("{id}")]

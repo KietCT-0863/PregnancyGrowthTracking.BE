@@ -75,7 +75,7 @@ public class AuthRepository : IAuthRepository
             UserName = request.Username,
             FullName = request.FullName,
             Email = request.Email,
-            Password = request.Password, // Không hash mật khẩu
+            Password = request.Password, 
             Dob = request.Dob,
             Phone = request.Phone,
             RoleId = 3, // Mặc định là Guest
@@ -116,7 +116,10 @@ public class AuthRepository : IAuthRepository
             Token = token,
             UserName = user.UserName,
             Email = user.Email,
-            Role = user.Role?.Role1 ?? "User"
+            Role = user.Role?.Role1 ?? "User",
+            UserId = user.UserId,
+            ProfileImageUrl = user.ProfileImageUrl
+
         };
     }
 
@@ -233,7 +236,8 @@ public class AuthRepository : IAuthRepository
             UserName = user.UserName,
             Email = user.Email,
             Role = "Guest",
-            ProfileImageUrl = user.ProfileImageUrl
+            ProfileImageUrl = user.ProfileImageUrl,
+            UserId = user.UserId
         };
     }
 

@@ -12,6 +12,6 @@ namespace PregnancyGrowthTracking.BLL.Services
     {
         Task<List<BlogDTO>> GetAllBlogWithCateAsync();
 
-        Task UpdateBlogAsync(BlogDTO blogDTO);
+        Task UpdateBlogAsync(int id, BlogDTO blogDTO);
     }
 }

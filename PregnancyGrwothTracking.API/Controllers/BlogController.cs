@@ -17,7 +17,7 @@ namespace PregnancyGrowthTracking.API.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult<List<BlogDTO>>> GetAllBlogs()
         {
             try
@@ -32,16 +32,12 @@ namespace PregnancyGrowthTracking.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> UpdateBlog(int id, [FromBody] BlogDTO blogDTO)
         {
             try
             {
-                if (id != blogDTO.Id)
-                {
-                    return BadRequest("ID không khớp");
-                }
-
-                await _blogService.UpdateBlogAsync(blogDTO);
+                await _blogService.UpdateBlogAsync(id ,blogDTO);
                 return Ok("Cập nhật blog thành công");
             }
             catch (Exception)

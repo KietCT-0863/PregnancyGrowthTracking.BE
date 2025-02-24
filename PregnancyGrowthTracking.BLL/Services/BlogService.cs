@@ -26,7 +26,6 @@ namespace PregnancyGrowthTracking.BLL.Services
             // vỡi mỗi blog có trong listBlog sẽ tương ứng với 1 blog trong listBlogDTO
             List<BlogDTO> listBlogDTO = listBlog.Select(b => new BlogDTO
             {
-                Id = b.BlogId,
                 Title = b.Title,
                 Body = b.Body,
 
@@ -40,9 +39,9 @@ namespace PregnancyGrowthTracking.BLL.Services
             return listBlogDTO;
         }
 
-        public async Task UpdateBlogAsync(BlogDTO blogDTO)
+        public async Task UpdateBlogAsync(int id, BlogDTO blogDTO)
         {
-            Blog existingBlog = await _blogRepo.GetBlogByIdAsync(blogDTO.Id);
+            Blog existingBlog = await _blogRepo.GetBlogByIdAsync(id);
 
             if (existingBlog == null)
             {

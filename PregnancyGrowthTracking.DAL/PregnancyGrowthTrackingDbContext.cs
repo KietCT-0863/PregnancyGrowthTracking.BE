@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using PregnancyGrowthTracking.DAL.Entities;
 
 namespace PregnancyGrowthTracking.DAL.Entities;
 
@@ -17,15 +16,11 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
     {
     }
 
-    public virtual DbSet<AcAlert> AcAlerts { get; set; }
-
     public virtual DbSet<Blog> Blogs { get; set; }
 
+    public virtual DbSet<BlogCate> BlogCates { get; set; }
+
     public virtual DbSet<Category> Categories { get; set; }
-
-    public virtual DbSet<EfwAlert> EfwAlerts { get; set; }
-
-    public virtual DbSet<FlAlert> FlAlerts { get; set; }
 
     public virtual DbSet<Foetu> Foetus { get; set; }
 
@@ -34,8 +29,6 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
     public virtual DbSet<GrowthDatum> GrowthData { get; set; }
 
     public virtual DbSet<GrowthStandard> GrowthStandards { get; set; }
-
-    public virtual DbSet<HcAlert> HcAlerts { get; set; }
 
     public virtual DbSet<Membership> Memberships { get; set; }
 
@@ -68,70 +61,41 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<AcAlert>(entity =>
-        {
-            entity.HasKey(e => e.AcAlertsId).HasName("PK__AC_Alert__C2AEC94CF3551F8F");
-
-            entity.ToTable("AC_Alerts");
-
-            entity.Property(e => e.AcAlertsId).HasColumnName("AC_Alerts_Id");
-            entity.Property(e => e.Notification).HasMaxLength(255);
-
-            entity.HasOne(d => d.GrowthStandard).WithMany(p => p.AcAlerts)
-                .HasForeignKey(d => d.GrowthStandardId)
-                .HasConstraintName("FK__AC_Alerts__Growt__5812160E");
-        });
-
         modelBuilder.Entity<Blog>(entity =>
         {
-            entity.HasKey(e => e.MediaId).HasName("PK__Blog__B2C2B5CFADFFB01A");
+            entity.HasKey(e => e.BlogId).HasName("PK__Blog__54379E30DBDC3E84");
 
             entity.ToTable("Blog");
 
-            entity.Property(e => e.Description).HasMaxLength(255);
+            entity.Property(e => e.Title).HasMaxLength(255);
+        });
 
-            entity.HasOne(d => d.Category).WithMany(p => p.Blogs)
+        modelBuilder.Entity<BlogCate>(entity =>
+        {
+            entity.HasKey(e => e.BlogCateId).HasName("PK__BlogCate__67D473BD50341D7B");
+
+            entity.ToTable("BlogCate");
+
+            entity.HasIndex(e => new { e.BlogId, e.CategoryId }, "UQ__BlogCate__F5A70D919D86AEAA").IsUnique();
+
+            entity.HasOne(d => d.Blog).WithMany(p => p.BlogCates)
+                .HasForeignKey(d => d.BlogId)
+                .HasConstraintName("FK__BlogCate__BlogId__0B91BA14");
+
+            entity.HasOne(d => d.Category).WithMany(p => p.BlogCates)
                 .HasForeignKey(d => d.CategoryId)
-                .HasConstraintName("FK__Blog__CategoryId__59063A47");
+                .HasConstraintName("FK__BlogCate__Catego__0C85DE4D");
         });
 
         modelBuilder.Entity<Category>(entity =>
         {
-            entity.HasKey(e => e.CategoryId).HasName("PK__Category__19093A0BCDF81237");
+            entity.HasKey(e => e.CategoryId).HasName("PK__Category__19093A0B16F5FB30");
 
             entity.ToTable("Category");
 
             entity.Property(e => e.Category1)
-                .HasMaxLength(100)
+                .HasMaxLength(255)
                 .HasColumnName("Category");
-        });
-
-        modelBuilder.Entity<EfwAlert>(entity =>
-        {
-            entity.HasKey(e => e.EfwAlertsId).HasName("PK__EFW_Aler__09801C5793FCC792");
-
-            entity.ToTable("EFW_Alerts");
-
-            entity.Property(e => e.EfwAlertsId).HasColumnName("EFW_Alerts_Id");
-            entity.Property(e => e.Notification).HasMaxLength(255);
-
-            entity.HasOne(d => d.GrowthStandard).WithMany(p => p.EfwAlerts)
-                .HasForeignKey(d => d.GrowthStandardId)
-                .HasConstraintName("FK__EFW_Alert__Growt__59FA5E80");
-        });
-
-        modelBuilder.Entity<FlAlert>(entity =>
-        {
-            entity.HasKey(e => e.FlAlertsId).HasName("PK__FL_Alert__993334F76F20F112");
-
-            entity.ToTable("FL_Alerts");
-
-            entity.Property(e => e.FlAlertsId).HasColumnName("FL_Alerts_Id");
-            entity.Property(e => e.Notification).HasMaxLength(255);
-
-            entity.HasOne(d => d.GrowthStandard).WithMany(p => p.FlAlerts)
-                .HasForeignKey(d => d.GrowthStandardId)
-                .HasConstraintName("FK__FL_Alerts__Growt__5AEE82B9");
         });
 
         modelBuilder.Entity<Foetu>(entity =>
@@ -180,20 +144,6 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
             entity.Property(e => e.EfwMedian).HasColumnName("EFW_Median");
             entity.Property(e => e.FlMedian).HasColumnName("FL_Median");
             entity.Property(e => e.HcMedian).HasColumnName("HC_Median");
-        });
-
-        modelBuilder.Entity<HcAlert>(entity =>
-        {
-            entity.HasKey(e => e.HcAlertsId).HasName("PK__HC_Alert__1F372C2EFBE5711D");
-
-            entity.ToTable("HC_Alerts");
-
-            entity.Property(e => e.HcAlertsId).HasColumnName("HC_Alerts_Id");
-            entity.Property(e => e.Notification).HasMaxLength(255);
-
-            entity.HasOne(d => d.GrowthStandard).WithMany(p => p.HcAlerts)
-                .HasForeignKey(d => d.GrowthStandardId)
-                .HasConstraintName("FK__HC_Alerts__Growt__5EBF139D");
         });
 
         modelBuilder.Entity<Membership>(entity =>

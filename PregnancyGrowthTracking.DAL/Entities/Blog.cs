@@ -5,13 +5,11 @@ namespace PregnancyGrowthTracking.DAL.Entities;
 
 public partial class Blog
 {
-    public int MediaId { get; set; }
+    public int BlogId { get; set; }
 
-    public string? Description { get; set; }
+    public string Title { get; set; } = null!;
 
-    public DateOnly? Date { get; set; }
+    public string Body { get; set; } = null!;
 
-    public int? CategoryId { get; set; }
-
-    public virtual Category? Category { get; set; }
+    public virtual ICollection<BlogCate> BlogCates { get; set; } = new List<BlogCate>();
 }

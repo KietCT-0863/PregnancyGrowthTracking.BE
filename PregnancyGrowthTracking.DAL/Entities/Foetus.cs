@@ -3,13 +3,17 @@ using System.Collections.Generic;
 
 namespace PregnancyGrowthTracking.DAL.Entities;
 
-public partial class Foetu
+public partial class Foetus
 {
     public int FoetusId { get; set; }
 
     public int? UserId { get; set; }
 
-    public virtual ICollection<GrowthDatum> GrowthData { get; set; } = new List<GrowthDatum>();
+    public DateOnly? Edd { get; set; }
+
+    public bool IsBorn { get; set; }
+
+    public virtual ICollection<GrowthData> GrowthData { get; set; } = new List<GrowthData>();
 
     public virtual User? User { get; set; }
 }

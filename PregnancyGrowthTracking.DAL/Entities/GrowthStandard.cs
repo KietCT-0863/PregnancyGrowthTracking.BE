@@ -17,5 +17,5 @@ public partial class GrowthStandard
 
     public double? EfwMedian { get; set; }
 
-    public virtual ICollection<GrowthDatum> GrowthData { get; set; } = new List<GrowthDatum>();
+    public virtual ICollection<GrowthData> GrowthData { get; set; } = new List<GrowthData>();
 }

@@ -172,6 +172,27 @@ namespace PregnancyGrwothTracking.API.Controllers
             }
         }
 
+        [HttpGet("check-payment/{userId}")]
+        public async Task<IActionResult> CheckPaymentStatus(int userId)
+        {
+            try
+            {
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null)
+                {
+                    return NotFound(new { Success = false, Message = "Người dùng không tồn tại." });
+                }
+
+                // Nếu RoleId là 2 thì thanh toán thành công, ngược lại là thất bại
+                bool isPaymentSuccessful = user.RoleId == 2;
+                return Ok(new { Success = isPaymentSuccessful });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Success = false, Message = ex.Message });
+            }
+        }
+
         [HttpGet("user-payments/{userId}")]
         public async Task<IActionResult> GetUserPayments(int userId)
         {

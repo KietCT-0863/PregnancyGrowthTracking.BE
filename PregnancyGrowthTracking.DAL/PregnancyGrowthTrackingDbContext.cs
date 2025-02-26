@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace PregnancyGrowthTracking.DAL.Entities;
 
@@ -18,9 +19,9 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
 
     public virtual DbSet<Blog> Blog { get; set; }
 
-    public virtual DbSet<BlogCate> BlogCates { get; set; }
+    public virtual DbSet<BlogCate> BlogCate { get; set; }
 
-    public virtual DbSet<Category> Categories { get; set; }
+    public virtual DbSet<Category> Categorie { get; set; }
 
     public virtual DbSet<Foetus> Foetus { get; set; }
 
@@ -28,7 +29,7 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
 
     public virtual DbSet<GrowthData> GrowthData { get; set; }
 
-    public virtual DbSet<GrowthStandard> GrowthStandard { get; set; }
+    public virtual DbSet<GrowthStandard> GrowthStandards { get; set; }
 
     public virtual DbSet<Membership> Memberships { get; set; }
 
@@ -67,6 +68,7 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
 
             entity.ToTable("Blog");
 
+            entity.Property(e => e.BlogImageUrl).HasMaxLength(500);
             entity.Property(e => e.Title).HasMaxLength(255);
         });
 
@@ -78,7 +80,7 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
 
             entity.HasIndex(e => new { e.BlogId, e.CategoryId }, "UQ__BlogCate__F5A70D919D86AEAA").IsUnique();
 
-            entity.HasOne(d => d.Blog).WithMany(p => p.BlogCate)
+            entity.HasOne(d => d.Blog).WithMany(p => p.BlogCates)
                 .HasForeignKey(d => d.BlogId)
                 .HasConstraintName("FK__BlogCate__BlogId__0B91BA14");
 
@@ -93,14 +95,14 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
 
             entity.ToTable("Category");
 
-            entity.Property(e => e.CategoryName)
-                .HasMaxLength(255)
-                .HasColumnName("Category");
+            entity.Property(e => e.CategoryName).HasMaxLength(255);
         });
 
         modelBuilder.Entity<Foetus>(entity =>
         {
             entity.HasKey(e => e.FoetusId).HasName("PK__Foetus__3291CDA2244862C2");
+
+            entity.Property(e => e.Edd).HasColumnName("EDD");
 
             entity.HasOne(d => d.User).WithMany(p => p.Foetus)
                 .HasForeignKey(d => d.UserId)
@@ -176,9 +178,7 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
 
             entity.ToTable("Role");
 
-            entity.Property(e => e.Role1)
-                .HasMaxLength(50)
-                .HasColumnName("Role");
+            entity.Property(e => e.RoleName).HasMaxLength(50);
         });
 
         modelBuilder.Entity<User>(entity =>
@@ -187,6 +187,9 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
 
             entity.ToTable("User");
 
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.Dob).HasColumnName("DOB");
             entity.Property(e => e.Email).HasMaxLength(100);
             entity.Property(e => e.FullName).HasMaxLength(100);

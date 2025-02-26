@@ -24,7 +24,7 @@ namespace PregnancyGrowthTracking.DAL.Repositories
         public async Task<List<Blog>> GetAllBlogWithCateAsync()
         {
             _dbContext = new();
-            return await _dbContext.Blog.Include(b => b.BlogCate).ThenInclude(bc => bc.Category).ToListAsync();
+            return await _dbContext.Blog.Include(b => b.BlogCates).ThenInclude(bc => bc.Category).ToListAsync();
         }
 
         public async Task UpdateBlogAsync(Blog blog)
@@ -37,26 +37,26 @@ namespace PregnancyGrowthTracking.DAL.Repositories
         public async Task<Blog> GetBlogByIdAsync(int blogId)
         {
             _dbContext = new();
-            return await _dbContext.Blog.Include(b => b.BlogCate).ThenInclude(bc => bc.Category).FirstOrDefaultAsync(b => b.BlogId == blogId);
+            return await _dbContext.Blog.Include(b => b.BlogCates).ThenInclude(bc => bc.Category).FirstOrDefaultAsync(b => b.BlogId == blogId);
         }
 
         public async Task AddBlogCateAsync(BlogCate blogCate)
         {
             _dbContext = new();
-            _dbContext.BlogCates.Add(blogCate);
+            _dbContext.BlogCate.Add(blogCate);
             await _dbContext.SaveChangesAsync();
         }
 
         public async Task<Category> GetCategoryByName(string cateName)
         {
             _dbContext = new();
-            return await _dbContext.Categories.FirstOrDefaultAsync(c => c.CategoryName == cateName);
+            return await _dbContext.Categorie.FirstOrDefaultAsync(c => c.CategoryName == cateName);
         }
 
         public async Task RemoveBlogCateAsyns(BlogCate blogCate)
         {
             _dbContext= new();
-            _dbContext.BlogCates.Remove(blogCate);
+            _dbContext.BlogCate.Remove(blogCate);
             await _dbContext.SaveChangesAsync();
         }
     }

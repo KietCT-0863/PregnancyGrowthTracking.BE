@@ -31,7 +31,7 @@ namespace PregnancyGrowthTracking.BLL.Services
                 Body = b.Body,
 
                 // với mỗi category trong BlogCate sẽ tương ứng với 1 category trong Categories
-                Categories = b.BlogCate.Select(bc => new BlogDTO.BlogCategoryDTO
+                Categories = b.BlogCates.Select(bc => new BlogDTO.BlogCategoryDTO
                 {
                     CategoryName = bc.Category.CategoryName
                 }).ToList()
@@ -63,7 +63,7 @@ namespace PregnancyGrowthTracking.BLL.Services
         {
             Blog existingBlog = await _blogRepo.GetBlogByIdAsync(blogDTO.Id);
 
-            foreach (BlogCate blogCate in existingBlog.BlogCate.ToList())
+            foreach (BlogCate blogCate in existingBlog.BlogCates.ToList())
             {
                 await _blogRepo.RemoveBlogCateAsyns(blogCate);
             }

@@ -116,7 +116,7 @@ public class AuthRepository : IAuthRepository
             Token = token,
             UserName = user.UserName,
             Email = user.Email,
-            Role = user.Role?.Role1 ?? "User",
+            Role = user.Role?.RoleName ?? "User",
             UserId = user.UserId,
             ProfileImageUrl = user.ProfileImageUrl
 
@@ -137,7 +137,7 @@ public class AuthRepository : IAuthRepository
     {
         new Claim(JwtRegisteredClaimNames.Sub, user.Email),
         new Claim(JwtRegisteredClaimNames.Name, user.UserName),
-        new Claim(ClaimTypes.Role, user.Role?.Role1 ?? "User")
+        new Claim(ClaimTypes.Role, user.Role?.RoleName ?? "User")
     };
 
         var token = new JwtSecurityToken(

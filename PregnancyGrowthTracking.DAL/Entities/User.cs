@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace PregnancyGrowthTracking.DAL.Entities;
 
@@ -24,7 +25,7 @@ public partial class User
     public int? RoleId { get; set; }
 
     public string? ProfileImageUrl { get; set; }
-
+    public DateTime CreatedAt { get; set; }
     public virtual ICollection<Foetus> Foetus { get; set; } = new List<Foetus>();
 
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();

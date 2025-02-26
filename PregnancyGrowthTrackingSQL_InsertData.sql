@@ -6,8 +6,8 @@ VALUES
 INSERT INTO Role (Role) 
 VALUES 
 ('admin'),
-('member'),
-('guest');
+('vip'),
+('member');
 
 INSERT INTO [dbo].[User] 
 ([UserName], [FullName], [Email], [Password], [DOB], [Phone], [Available], [RoleId], [ProfileImageUrl], [CreatedAt]) 

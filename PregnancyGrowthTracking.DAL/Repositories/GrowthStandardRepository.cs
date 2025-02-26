@@ -17,13 +17,13 @@ namespace PregnancyGrowthTracking.DAL.Repositories
         public async Task<List<GrowthStandard>> GetAllGrowthStandardAsync()
         {
             _dbContext = new();
-            return await _dbContext.GrowthStandard.ToListAsync();
+            return await _dbContext.GrowthStandards.ToListAsync();
         }
 
         public async Task<bool> AddGrowthStandardAsync(GrowthStandard growthStandard)
         {
             _dbContext = new();
-            _dbContext.GrowthStandard.Add(growthStandard);
+            _dbContext.GrowthStandards.Add(growthStandard);
             await _dbContext.SaveChangesAsync();
             return true;
         }
@@ -31,7 +31,7 @@ namespace PregnancyGrowthTracking.DAL.Repositories
         public async Task<bool> UpdateGrowthStandardAsync(GrowthStandard growthStandard)
         {
             _dbContext = new();
-            _dbContext.GrowthStandard.Update(growthStandard);
+            _dbContext.GrowthStandards.Update(growthStandard);
             await _dbContext.SaveChangesAsync();
             return true;
         }
@@ -39,7 +39,7 @@ namespace PregnancyGrowthTracking.DAL.Repositories
         public async Task<GrowthStandard?> GetGrowthStandardByAgeAsync(int? gestationalAge)
         {
             _dbContext = new();
-            return await _dbContext.GrowthStandard.FirstOrDefaultAsync(gs => gs.GestationalAge == gestationalAge);
+            return await _dbContext.GrowthStandards.FirstOrDefaultAsync(gs => gs.GestationalAge == gestationalAge);
         }
     }
 }

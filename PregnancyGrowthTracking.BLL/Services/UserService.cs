@@ -33,7 +33,7 @@ namespace PregnancyGrowthTracking.BLL.Services
                 Dob = u.Dob,
                 Available = u.Available ?? false,  
                 RoleId = u.RoleId ?? 0,            
-                Role = u.Role?.Role1               
+                Role = u.Role?.RoleName               
             }).ToList();
         }
 
@@ -53,7 +53,7 @@ namespace PregnancyGrowthTracking.BLL.Services
                 Dob = user.Dob,
                 Available = user.Available ?? false,
                 RoleId = user.RoleId ?? 0,
-                Role = user.Role?.Role1
+                Role = user.Role?.RoleName
             };
         }
 
@@ -181,7 +181,7 @@ namespace PregnancyGrowthTracking.BLL.Services
                 Dob = u.Dob,
                 Available = u.Available ?? false,  
                 RoleId = u.RoleId ?? 0,
-                Role = u.Role?.Role1  
+                Role = u.Role?.RoleName
             }).ToList();
         }
 

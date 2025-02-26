@@ -9,27 +9,25 @@ VALUES
 ('member'),
 ('guest');
 
-INSERT INTO [User] (UserName, FullName, Email, Password, DOB, Phone, Available, RoleId, ProfileImageUrl)
-VALUES
--- Admin
-('admin_user', 'Admin User', 'admin@example.com', 'admin123', '1980-01-01', '0123456789', 1, 1, null),
--- Members
-('member1', 'Member One', 'member1@example.com', 'member123', '1990-02-01', '0987654321', 1, 2, null),
-('member2', 'Member Two', 'member2@example.com', 'member123', '1992-03-01', '0987654322', 1, 2, null),
-('member3', 'Member Three', 'member3@example.com', 'member123', '1994-04-01', '0987654323', 1, 2, null),
-('member4', 'Member Four', 'member4@example.com', 'member123', '1996-05-01', '0987654324', 1, 2, null),
-('member5', 'Member Five', 'member5@example.com', 'member123', '1998-06-01', '0987654325', 1, 2, null),
--- Guests
-('guest1', 'Guest One', 'guest1@example.com', 'guest123', '2000-07-01', '0987654326', 1, 3, null),
-('guest2', 'Guest Two', 'guest2@example.com', 'guest123', '2001-08-01', '0987654327', 1, 3, null),
-('guest3', 'Guest Three', 'guest3@example.com', 'guest123', '2002-09-01', '0987654328', 1, 3, null),
-('guest4', 'Guest Four', 'guest4@example.com', 'guest123', '2003-10-01', '0987654329', 1, 3, null),
-('guest5', 'Guest Five', 'guest5@example.com', 'guest123', '2004-11-01', '0987654330', 1, 3, null),
-('guest6', 'Guest Six', 'guest6@example.com', 'guest123', '2005-12-01', '0987654331', 1, 3, null),
-('guest7', 'Guest Seven', 'guest7@example.com', 'guest123', '2006-01-01', '0987654332', 1, 3, null),
-('guest8', 'Guest Eight', 'guest8@example.com', 'guest123', '2007-02-01', '0987654333', 1, 3, null),
-('guest9', 'Guest Nine', 'guest9@example.com', 'guest123', '2008-03-01', '0987654334', 1, 3, null),
-('guest10', 'Guest Ten', 'guest10@example.com', 'guest123', '2009-04-01', '0987654335', 1, 3, null);
+INSERT INTO [dbo].[User] 
+([UserName], [FullName], [Email], [Password], [DOB], [Phone], [Available], [RoleId], [ProfileImageUrl], [CreatedAt]) 
+VALUES 
+('admin_user', 'Admin User', 'admin@example.com', 'admin123', '1980-01-01', '0123456789', 1, 1, NULL, '2025-02-26 19:22:07.843'),
+('vip1', 'Vip One', 'vip1@example.com', 'vip123', '1990-02-01', '0987654321', 1, 2, NULL, '2025-02-26 19:22:07.843'),
+('vip2', 'Vip Two', 'vip2@example.com', 'vip123', '1992-03-01', '0987654322', 1, 2, NULL, '2025-02-26 19:22:07.843'),
+('vip3', 'Vip Three', 'vip3@example.com', 'vip123', '1994-04-01', '0987654323', 1, 2, NULL, '2025-02-26 19:22:07.843'),
+('vip4', 'Vip Four', 'vip4@example.com', 'vip123', '1996-05-01', '0987654324', 1, 2, NULL, '2025-02-26 19:22:07.843'),
+('vip5', 'Vip Five', 'vip5@example.com', 'vip123', '1998-06-01', '0987654325', 1, 2, NULL, '2025-02-26 19:22:07.843'),
+('member1', 'Member One', 'member1@example.com', 'member123', '2000-07-01', '0987654326', 1, 3, NULL, '2025-02-26 19:22:07.843'),
+('member2', 'Member Two', 'member2@example.com', 'member123', '2001-08-01', '0987654327', 1, 3, NULL, '2025-02-26 19:22:07.843'),
+('member3', 'Member Three', 'member3@example.com', 'member123', '2002-09-01', '0987654328', 1, 3, NULL, '2025-02-26 19:22:07.843'),
+('member4', 'Member Four', 'member4@example.com', 'member123', '2003-10-01', '0987654329', 1, 3, NULL, '2025-02-26 19:22:07.843'),
+('member5', 'Member Five', 'member5@example.com', 'member123', '2004-11-01', '0987654330', 1, 3, NULL, '2025-02-26 19:22:07.843'),
+('member6', 'Member Six', 'member6@example.com', 'member123', '2005-12-01', '0987654331', 1, 3, NULL, '2025-02-26 19:22:07.843'),
+('member7', 'Member Seven', 'member7@example.com', 'member123', '2006-01-01', '0987654332', 1, 3, NULL, '2025-02-26 19:22:07.843'),
+('member8', 'Member Eight', 'member8@example.com', 'member123', '2007-02-01', '0987654333', 1, 3, NULL, '2025-02-26 19:22:07.843'),
+('member9', 'Member Nine', 'member9@example.com', 'member123', '2008-03-01', '0987654334', 1, 3, NULL, '2025-02-26 19:22:07.843'),
+('member10', 'Member Ten', 'member10@example.com', 'member123', '2009-04-01', '0987654335', 1, 3, NULL, '2025-02-26 19:22:07.843');
 
 INSERT INTO Foetus (UserId)
 VALUES

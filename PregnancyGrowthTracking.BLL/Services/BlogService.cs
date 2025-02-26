@@ -3,6 +3,7 @@ using PregnancyGrowthTracking.DAL.Entities;
 using PregnancyGrowthTracking.DAL.Repositories;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -39,9 +40,9 @@ namespace PregnancyGrowthTracking.BLL.Services
             return listBlogDTO;
         }
 
-        public async Task UpdateBlogAsync(int id, BlogDTO blogDTO)
+        public async Task UpdateBlogAsync(BlogDTO blogDTO)
         {
-            Blog existingBlog = await _blogRepo.GetBlogByIdAsync(id);
+            Blog existingBlog = await _blogRepo.GetBlogByIdAsync(blogDTO.Id);
 
             if (existingBlog == null)
             {
@@ -50,10 +51,35 @@ namespace PregnancyGrowthTracking.BLL.Services
 
             existingBlog.Title = blogDTO.Title ?? existingBlog.Title;
             existingBlog.Body = blogDTO.Body ?? existingBlog.Body;
-
-            //không update đc dữ liệu trong BlogCate
-
             await _blogRepo.UpdateBlogAsync(existingBlog);
+
+            if (blogDTO.Categories != null)
+            {
+                await UpdateBlogCateAsync(blogDTO);
+            }
+        }
+
+        public async Task UpdateBlogCateAsync(BlogDTO blogDTO)
+        {
+            Blog existingBlog = await _blogRepo.GetBlogByIdAsync(blogDTO.Id);
+
+            foreach (BlogCate blogCate in existingBlog.BlogCate.ToList())
+            {
+                await _blogRepo.RemoveBlogCateAsyns(blogCate);
+            }
+
+            foreach (var blogCate in blogDTO.Categories.ToList())
+            {
+                Category currentCate = await _blogRepo.GetCategoryByName(blogCate.CategoryName);
+
+                BlogCate currentBlogCate = new BlogCate()
+                {
+                    BlogId = existingBlog.BlogId,
+                    CategoryId = currentCate.CategoryId
+                };
+
+                await _blogRepo.AddBlogCateAsync(currentBlogCate);
+            }
         }
     }
 }

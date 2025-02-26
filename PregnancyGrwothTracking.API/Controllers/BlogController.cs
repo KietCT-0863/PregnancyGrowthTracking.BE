@@ -31,13 +31,13 @@ namespace PregnancyGrowthTracking.API.Controllers
             }
         }
 
-        [HttpPut("{id}")]
+        [HttpPut]
         [Authorize(Roles = "admin")]
-        public async Task<IActionResult> UpdateBlog(int id, [FromBody] BlogDTO blogDTO)
+        public async Task<IActionResult> UpdateBlog([FromBody] BlogDTO blogDTO)
         {
             try
             {
-                await _blogService.UpdateBlogAsync(id ,blogDTO);
+                await _blogService.UpdateBlogAsync(blogDTO);
                 return Ok("Cập nhật blog thành công");
             }
             catch (Exception)

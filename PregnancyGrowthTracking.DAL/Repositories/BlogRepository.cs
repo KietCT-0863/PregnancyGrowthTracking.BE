@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Amazon.S3.Model.Internal.MarshallTransformations;
+using Microsoft.EntityFrameworkCore;
 using PregnancyGrowthTracking.DAL.Entities;
 using System;
 using System.Collections.Generic;
@@ -39,10 +40,23 @@ namespace PregnancyGrowthTracking.DAL.Repositories
             return await _dbContext.Blog.Include(b => b.BlogCate).ThenInclude(bc => bc.Category).FirstOrDefaultAsync(b => b.BlogId == blogId);
         }
 
-        public async Task UpdateBlogCateAsync(BlogCate blogCate)
+        public async Task AddBlogCateAsync(BlogCate blogCate)
         {
             _dbContext = new();
-            _dbContext.BlogCates.Update(blogCate);
+            _dbContext.BlogCates.Add(blogCate);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<Category> GetCategoryByName(string cateName)
+        {
+            _dbContext = new();
+            return await _dbContext.Categories.FirstOrDefaultAsync(c => c.CategoryName == cateName);
+        }
+
+        public async Task RemoveBlogCateAsyns(BlogCate blogCate)
+        {
+            _dbContext= new();
+            _dbContext.BlogCates.Remove(blogCate);
             await _dbContext.SaveChangesAsync();
         }
     }

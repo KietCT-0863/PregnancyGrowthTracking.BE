@@ -12,8 +12,6 @@ using Microsoft.AspNetCore.Http.Json;
 
 namespace PregnancyGrwothTracking.API.Controllers
 {
-
-
     [ApiController]
     [Route("api/[controller]")]
     public class PaymentController : ControllerBase
@@ -22,7 +20,6 @@ namespace PregnancyGrwothTracking.API.Controllers
         private readonly PregnancyGrowthTrackingDbContext _context;
         private readonly ILogger<PaymentController> _logger;
         private readonly IConfiguration _configuration;
-
 
         public PaymentController(IVnPayService vnPayService,
             PregnancyGrowthTrackingDbContext context,
@@ -50,6 +47,7 @@ namespace PregnancyGrwothTracking.API.Controllers
                 var user = await _context.Users.FindAsync(model.UserId);
                 if (user == null)
                     return NotFound("User not found");
+
                 if (user.RoleId == 1 || user.RoleId == 2)
                 {
                     return BadRequest(new { message = "Bạn đã là thành viên, không cần thanh toán nữa." });

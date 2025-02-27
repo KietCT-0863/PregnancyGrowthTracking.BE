@@ -17,7 +17,6 @@ namespace PregnancyGrowthTracking.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "admin")]
         public async Task<ActionResult<List<BlogDTO>>> GetAllBlogs()
         {
             try

@@ -22,7 +22,19 @@ namespace PregnancyGrowthTracking.API.Controllers
             try
             {
                 var blogs = await _blogService.GetAllBlogWithCateAsync();
-                return Ok(blogs);
+
+                // Apply Nested JSON
+                var resutl = new
+                {
+                    posts = blogs.Select(b => new ReturnBlogDTO
+                    {
+                        Id = b.Id,
+                        Title = b.Title,
+                        Body = b.Body,
+                        Categories = b.Categories.Select(c => c.CategoryName).ToList()
+                    })
+                };
+                return Ok(resutl);
             }
             catch (Exception)
             {

@@ -102,7 +102,8 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
         {
             entity.HasKey(e => e.FoetusId).HasName("PK__Foetus__3291CDA2244862C2");
 
-            entity.Property(e => e.Edd).HasColumnName("EDD");
+            entity.Property(e => e.Gender).HasMaxLength(10);
+            entity.Property(e => e.Name).HasMaxLength(255);
 
             entity.HasOne(d => d.User).WithMany(p => p.Foetus)
                 .HasForeignKey(d => d.UserId)

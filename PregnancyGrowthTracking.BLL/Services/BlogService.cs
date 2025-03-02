@@ -1,4 +1,5 @@
-﻿using PregnancyGrowthTracking.DAL.DTOs;
+﻿using Amazon.S3.Model;
+using PregnancyGrowthTracking.DAL.DTOs;
 using PregnancyGrowthTracking.DAL.Entities;
 using PregnancyGrowthTracking.DAL.Repositories;
 using System;
@@ -13,10 +14,14 @@ namespace PregnancyGrowthTracking.BLL.Services
     public class BlogService : IBlogService
     {
         private readonly IBlogRepository _blogRepo;
+        private readonly IBlogCateRepository _blogCateRepo;
+        private readonly ICateRepository _cateRepo;
 
-        public BlogService(IBlogRepository blogRepo)
+        public BlogService(IBlogRepository blogRepo, IBlogCateRepository blogCateRepo, ICateRepository cateRepo)
         {
             _blogRepo = blogRepo;
+            _blogCateRepo = blogCateRepo;
+            _cateRepo = cateRepo;
         }
 
         // sử dụng lớp BlogDTO ở đây để tránh circular reference cũng như quản lý/giới hạn  thông tin mà client nhận được để tránh lộ thông tin nhạy cảm
@@ -56,36 +61,96 @@ namespace PregnancyGrowthTracking.BLL.Services
 
             if (blogDTO.Categories != null)
             {
+
                 await UpdateBlogCateAsync(blogDTO);
+
             }
         }
 
         public async Task UpdateBlogCateAsync(BlogDTO blogDTO)
         {
             Blog existingBlog = await _blogRepo.GetBlogByIdAsync(blogDTO.Id);
+            Category? currentCate = null;
+            List<BlogCate> currentListBlogCate = new();
 
             foreach (var blogCate in blogDTO.Categories.ToList())
             {
-                Category currentCate = await _blogRepo.GetCategoryByName(blogCate.CategoryName);
-
-                if(currentCate == null)
+                if (blogCate.CategoryName == "")
                 {
                     return;
                 }
 
-                BlogCate currentBlogCate = new BlogCate()
+                currentCate = await _cateRepo.GetCategoryByName(blogCate.CategoryName);
+
+                currentListBlogCate.Add(new BlogCate()
                 {
                     BlogId = existingBlog.BlogId,
                     CategoryId = currentCate.CategoryId
+                });
+            }
+
+            if (currentListBlogCate != null)
+            {
+                foreach (BlogCate blogCate in existingBlog.BlogCates.ToList())
+                {
+                    await _blogCateRepo.RemoveBlogCateAsyns(blogCate);
+                }
+            }
+
+            foreach (BlogCate? blogCate in currentListBlogCate)
+            {
+                if (blogCate != null)
+                {
+                    await _blogCateRepo.AddBlogCateAsync(blogCate);
+                }
+            }
+        }
+
+        public async Task AddBlogAsync(CreateBlogDTO blogDTO)
+        {
+            Blog blog = new Blog
+            {
+                Title = blogDTO.Title,
+                Body = blogDTO.Body,
+            };
+
+            await _blogRepo.AddBlogAsync(blog);
+
+            Blog newBlog = await _blogRepo.GetBlogByTitleAndBodyAsync(blog.Title, blog.Body);
+
+            foreach (var blogcate in blogDTO.Categories)
+            {
+                Category newCate = await _cateRepo.GetCategoryByName(blogcate.CategoryName);
+                BlogCate newBlogCate = new BlogCate
+                {
+                    BlogId = newBlog.BlogId,
+                    CategoryId = newCate.CategoryId
                 };
 
-                await _blogRepo.AddBlogCateAsync(currentBlogCate);
+                await _blogCateRepo.AddBlogCateAsync(newBlogCate);
+            }
+        }
+
+        public async Task DeleteBlogAsync(int blogID)
+        {
+            if (blogID < 0)
+            {
+                throw new ArgumentException("Blog Id phải lớn hơn 1");
             }
 
-            foreach (BlogCate blogCate in existingBlog.BlogCates.ToList())
+            Blog currentBlog = await _blogRepo.GetBlogByIdAsync(blogID);
+
+            if (currentBlog == null)
             {
-                await _blogRepo.RemoveBlogCateAsyns(blogCate);
+                throw new Exception();
             }
+
+            foreach (BlogCate blogCate in currentBlog.BlogCates.ToList())
+            {
+                await _blogCateRepo.RemoveBlogCateAsyns(blogCate);
+            }
+
+            await _blogRepo.DeleteBlogAsync(currentBlog);
         }
     }
 }

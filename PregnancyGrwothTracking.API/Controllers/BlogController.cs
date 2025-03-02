@@ -24,7 +24,7 @@ namespace PregnancyGrowthTracking.API.Controllers
                 var blogs = await _blogService.GetAllBlogWithCateAsync();
 
                 // Apply Nested JSON
-                var resutl = new
+                var result = new
                 {
                     posts = blogs.Select(b => new ReturnBlogDTO
                     {
@@ -34,7 +34,7 @@ namespace PregnancyGrowthTracking.API.Controllers
                         Categories = b.Categories.Select(c => c.CategoryName).ToList()
                     })
                 };
-                return Ok(resutl);
+                return Ok(result);
             }
             catch (Exception)
             {
@@ -51,9 +51,47 @@ namespace PregnancyGrowthTracking.API.Controllers
                 await _blogService.UpdateBlogAsync(blogDTO);
                 return Ok("Cập nhật blog thành công");
             }
+            catch (ArgumentException e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
             catch (Exception)
             {
                 return StatusCode(500, "Có lỗi xảy ra khi cập nhật blog");
+            }
+        }
+
+        [HttpPost]
+        //[Authorize(Roles = "admin")]
+        public async Task<IActionResult> AddBlog([FromBody] CreateBlogDTO createBlogDTO)
+        {
+            try
+            {
+                await _blogService.AddBlogAsync(createBlogDTO);
+                return Ok("Thêm blog thành công");
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Có lỗi xảy ra khi thêm blog");
+            }
+        }
+
+        [HttpDelete()]
+        public async Task<IActionResult> DeleteBlog(int blogID)
+        {
+            try
+            {
+                if (blogID < 1)
+                {
+                    return BadRequest("Blog id là bắt buộc");
+                }
+
+                await _blogService.DeleteBlogAsync(blogID);
+                return Ok("Blog deleted successfully.");
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Có lỗi xảy ra khi xoá blog");
             }
         }
     }

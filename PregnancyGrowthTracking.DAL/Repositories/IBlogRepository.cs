@@ -15,12 +15,10 @@ namespace PregnancyGrowthTracking.DAL.Repositories
 
         Task UpdateBlogAsync(Blog blog);
 
+        Task DeleteBlogAsync(Blog blog);
+
         Task<Blog> GetBlogByIdAsync(int blogId);
 
-        Task AddBlogCateAsync(BlogCate blogCate);
-
-        Task<Category> GetCategoryByName(string cateName);
-
-        Task RemoveBlogCateAsyns(BlogCate blogCate);
+        Task<Blog> GetBlogByTitleAndBodyAsync(string title, string body);
     }
 }

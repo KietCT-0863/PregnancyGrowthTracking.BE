@@ -158,6 +158,8 @@ namespace PregnancyGrwothTracking.API
 
             // khai báo Blog
             builder.Services.AddScoped<IBlogRepository, BlogRepository>();
+            builder.Services.AddScoped<IBlogCateRepository, BlogCateRepository>();
+            builder.Services.AddScoped<ICateRepository, CateRepository>();
             builder.Services.AddScoped<IBlogService, BlogService>();
 
             var app = builder.Build();

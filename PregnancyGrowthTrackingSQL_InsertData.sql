@@ -3,7 +3,7 @@ VALUES
     ('Free', 0),
     ('Pay', 9.99);
 
-INSERT INTO Role (Role) 
+INSERT INTO Role (RoleName) 
 VALUES 
 ('admin'),
 ('vip'),
@@ -152,12 +152,12 @@ VALUES
 
 
 -- Chèn dữ liệu vào bảng Category (chỉ chèn nếu chưa tồn tại để tránh trùng lặp)
-INSERT INTO Category (Category)
+INSERT INTO Category (CategoryName)
 SELECT DISTINCT tag FROM (
     VALUES ('history'), ('american'), ('crime'), ('french'), ('fiction'), ('english'), ('magical'), ('mystery'), ('love'), ('classic')
 ) AS Categories(tag)
 WHERE NOT EXISTS (
-    SELECT 1 FROM Category c WHERE c.Category = Categories.tag
+    SELECT 1 FROM Category c WHERE c.CategoryName = Categories.tag
 );
 
 -- Chèn dữ liệu vào bảng BlogCate
@@ -198,4 +198,4 @@ JOIN (
     (30, 'american'), (30, 'love'), (30, 'fiction')
 ) AS BlogTags(BlogId, CategoryName)
 ON b.BlogId = BlogTags.BlogId
-JOIN Category c ON BlogTags.CategoryName = c.Category;
+JOIN Category c ON BlogTags.CategoryName = c.CategoryName;

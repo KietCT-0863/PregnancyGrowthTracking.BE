@@ -23,11 +23,11 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
 
     public virtual DbSet<Category> Categorie { get; set; }
 
-    public virtual DbSet<Foetus> Foetus { get; set; }
+    public virtual DbSet<Foetu> Foetus { get; set; }
 
     public virtual DbSet<ForumTag> ForumTags { get; set; }
 
-    public virtual DbSet<GrowthData> GrowthData { get; set; }
+    public virtual DbSet<GrowthDatum> GrowthData { get; set; }
 
     public virtual DbSet<GrowthStandard> GrowthStandards { get; set; }
 
@@ -98,11 +98,12 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
             entity.Property(e => e.CategoryName).HasMaxLength(255);
         });
 
-        modelBuilder.Entity<Foetus>(entity =>
+        modelBuilder.Entity<Foetu>(entity =>
         {
             entity.HasKey(e => e.FoetusId).HasName("PK__Foetus__3291CDA2244862C2");
 
-            entity.Property(e => e.Edd).HasColumnName("EDD");
+            entity.Property(e => e.Gender).HasMaxLength(10);
+            entity.Property(e => e.Name).HasMaxLength(255);
 
             entity.HasOne(d => d.User).WithMany(p => p.Foetus)
                 .HasForeignKey(d => d.UserId)
@@ -118,7 +119,7 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
             entity.Property(e => e.Description).HasMaxLength(100);
         });
 
-        modelBuilder.Entity<GrowthData>(entity =>
+        modelBuilder.Entity<GrowthDatum>(entity =>
         {
             entity.HasKey(e => e.GrowthDataId).HasName("PK__GrowthDa__AB04941B8A6ECEA0");
 

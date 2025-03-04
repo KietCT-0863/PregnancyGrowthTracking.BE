@@ -23,7 +23,7 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
 
     public virtual DbSet<Category> Categorie { get; set; }
 
-    public virtual DbSet<Foetu> Foetus { get; set; }
+    public virtual DbSet<Foetus> Foetus { get; set; }
 
     public virtual DbSet<ForumTag> ForumTags { get; set; }
 
@@ -98,17 +98,18 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
             entity.Property(e => e.CategoryName).HasMaxLength(255);
         });
 
-        modelBuilder.Entity<Foetu>(entity =>
-        {
-            entity.HasKey(e => e.FoetusId).HasName("PK__Foetus__3291CDA2244862C2");
+        modelBuilder.Entity<Foetus>(entity =>
+{
+    entity.HasKey(e => e.FoetusId).HasName("PK__Foetus__3291CDA2244862C2");
 
-            entity.Property(e => e.Gender).HasMaxLength(10);
-            entity.Property(e => e.Name).HasMaxLength(255);
+    entity.Property(e => e.Gender).HasMaxLength(10);
+    entity.Property(e => e.Name).HasMaxLength(255);
 
-            entity.HasOne(d => d.User).WithMany(p => p.Foetus)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__Foetus__UserId__5BE2A6F2");
-        });
+    entity.HasOne(d => d.User).WithMany(p => p.Foetus)
+        .HasForeignKey(d => d.UserId)
+        .HasConstraintName("FK__Foetus__UserId__5BE2A6F2");
+});
+
 
         modelBuilder.Entity<ForumTag>(entity =>
         {

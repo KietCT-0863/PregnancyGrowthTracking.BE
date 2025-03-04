@@ -83,7 +83,12 @@ namespace PregnancyGrowthTracking.BLL.Services
                 UserId = createdUser.UserId,
                 UserName = createdUser.UserName,
                 FullName = createdUser.FullName,
-                Email = createdUser.Email
+                Email = createdUser.Email,
+                Phone = createdUser.Phone,
+                Dob= createdUser.Dob,
+                Available = createdUser.Available ?? false,
+                RoleId = user.RoleId ?? 0,
+                Role = user.Role?.RoleName
             };
         }
 
@@ -101,8 +106,8 @@ namespace PregnancyGrowthTracking.BLL.Services
             }
 
             //  Kiểm tra FullName (không chứa số & ký tự đặc biệt)
-            if (!string.IsNullOrWhiteSpace(request.FullName) && !Regex.IsMatch(request.FullName, @"^[a-zA-Z\s]{2,50}$"))
-                throw new ArgumentException("Họ và tên phải chứa từ 2-50 ký tự, không chứa số hoặc ký tự đặc biệt.");
+            if (!string.IsNullOrWhiteSpace(request.FullName) && !Regex.IsMatch(request.FullName, @"^[a-zA-Z\s]{4,30}$"))
+                throw new ArgumentException("Họ và tên phải chứa từ 4-30 ký tự, không chứa số hoặc ký tự đặc biệt.");
 
             //  Kiểm tra Email (nếu có cập nhật)
             if (!string.IsNullOrWhiteSpace(request.Email) && !Regex.IsMatch(request.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))

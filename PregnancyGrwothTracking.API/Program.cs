@@ -107,6 +107,15 @@ namespace PregnancyGrwothTracking.API
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddSingleton<IS3Repository, S3Repository>();
             builder.Services.AddSingleton<IS3Service, S3Service>();
+            builder.Services.AddScoped<IFoetusRepository, FoetusRepository>();
+            builder.Services.AddScoped<IFoetusService, FoetusService>();
+            builder.Services.AddScoped<IGrowthStandardRepository, GrowthStandardRepository>();
+            builder.Services.AddScoped<IGrowthDataService, GrowthDataService>();
+            builder.Services.AddScoped<IGrowthDataRepository, GrowthDataRepository>();
+            builder.Services.AddScoped<IGrowthStandardServices, GrowthStandardServices>();
+            builder.Services.AddScoped<IGrowthStandardRepository, GrowthStandardRepository>();
+
+
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll",
@@ -156,8 +165,7 @@ namespace PregnancyGrwothTracking.API
                 );
             });
 
-            // khai báo GrowthStandard
-            builder.Services.AddScoped<IGrowthStandardServices, GrowthStandardServices>();
+            
 
             // khai báo Blog
             builder.Services.AddScoped<IBlogRepository, BlogRepository>();

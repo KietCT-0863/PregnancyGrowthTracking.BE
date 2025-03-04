@@ -26,7 +26,7 @@ public partial class User
 
     public string? ProfileImageUrl { get; set; }
     public DateTime CreatedAt { get; set; }
-    public virtual ICollection<Foetu> Foetus { get; set; } = new List<Foetu>();
+    public virtual ICollection<Foetus> Foetus { get; set; } = new List<Foetus>();
 
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 

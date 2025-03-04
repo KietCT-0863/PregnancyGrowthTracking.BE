@@ -137,7 +137,8 @@ public class AuthRepository : IAuthRepository
     {
         new Claim(JwtRegisteredClaimNames.Sub, user.Email),
         new Claim(JwtRegisteredClaimNames.Name, user.UserName),
-        new Claim(ClaimTypes.Role, user.Role?.RoleName ?? "User")
+        new Claim(ClaimTypes.Role, user.Role?.RoleName ?? "User"),
+        new Claim("UserId", user.UserId.ToString()) // Thêm UserId vào claims
     };
 
         var token = new JwtSecurityToken(

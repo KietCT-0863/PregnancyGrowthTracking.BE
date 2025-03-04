@@ -23,7 +23,7 @@ public partial class GrowthDatum
 
     public double? Efw { get; set; }
 
-    public virtual Foetu? Foetus { get; set; }
+    public virtual Foetus? Foetus { get; set; }
 
     public virtual GrowthStandard? GrowthStandard { get; set; }
 }

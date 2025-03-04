@@ -181,7 +181,7 @@ namespace PregnancyGrwothTracking.API.Controllers
                     return NotFound(new { Success = false, Message = "Người dùng không tồn tại." });
                 }
 
-                // Nếu RoleId là 2 thì thanh toán thành công, ngược lại là thất bại
+                
                 bool isPaymentSuccessful = user.RoleId == 2;
                 return Ok(new { Success = isPaymentSuccessful });
             }

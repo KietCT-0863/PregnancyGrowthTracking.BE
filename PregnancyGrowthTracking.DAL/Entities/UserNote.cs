@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace PregnancyGrowthTracking.DAL.Entities;
 
@@ -14,6 +15,7 @@ public partial class UserNote
     public string? Detail { get; set; }
 
     public string? UserNotePhoto { get; set; }
+    [JsonIgnore]
 
     public virtual User? User { get; set; }
 }

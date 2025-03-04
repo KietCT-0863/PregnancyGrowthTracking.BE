@@ -56,6 +56,9 @@ namespace PregnancyGrwothTracking.API
 
             //Connect VNPay API
             builder.Services.AddScoped<IVnPayService, VnPayService>();
+            builder.Services.AddScoped<IUserNoteRepository, UserNoteRepository>();
+            builder.Services.AddScoped<IUserNoteService, UserNoteService>();
+
 
 
             // Add services to the container.

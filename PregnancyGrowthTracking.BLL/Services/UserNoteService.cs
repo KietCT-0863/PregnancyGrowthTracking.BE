@@ -1,4 +1,5 @@
-﻿using PregnancyGrowthTracking.DAL.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using PregnancyGrowthTracking.DAL.Entities;
 using PregnancyGrowthTracking.DAL.Repositories;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -31,12 +32,18 @@ namespace PregnancyGrowthTracking.BLL.Services
 
         public async Task UpdateNoteAsync(UserNote note)
         {
-            await _noteRepository.UpdateAsync(note);
+            await _noteRepository.UpdateAsync(note); 
+            await _noteRepository.SaveChangesAsync(); 
         }
 
         public async Task DeleteNoteAsync(int noteId)
         {
             await _noteRepository.DeleteAsync(noteId);
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await _noteRepository.SaveChangesAsync(); // Lưu thay đổi vào database
         }
     }
 }

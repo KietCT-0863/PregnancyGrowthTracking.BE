@@ -10,6 +10,7 @@ namespace PregnancyGrowthTracking.BLL.Services
         Task<UserNote?> GetNoteByIdAsync(int noteId);
         Task AddNoteAsync(UserNote note);
         Task UpdateNoteAsync(UserNote note);
+        Task SaveChangesAsync();
         Task DeleteNoteAsync(int noteId);
     }
 }

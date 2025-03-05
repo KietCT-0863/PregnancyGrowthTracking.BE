@@ -10,6 +10,8 @@ namespace PregnancyGrowthTracking.DAL.Repositories
         Task<UserNote?> GetByIdAsync(int noteId);
         Task AddAsync(UserNote note);
         Task UpdateAsync(UserNote note);
+        Task SaveChangesAsync();
         Task DeleteAsync(int noteId);
+        
     }
 }

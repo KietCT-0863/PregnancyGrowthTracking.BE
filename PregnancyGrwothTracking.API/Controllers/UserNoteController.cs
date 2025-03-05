@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using PregnancyGrowthTracking.BLL.Services;
 using PregnancyGrowthTracking.DAL.Entities;
 using System.Collections.Generic;
@@ -8,6 +8,7 @@ using Amazon.S3.Model;
 using Microsoft.Extensions.Configuration;
 using System;
 using Amazon;
+using PregnancyGrowthTracking.DAL.DTOs;
 
 namespace PregnancyGrowthTracking.API.Controllers
 {
@@ -39,22 +40,50 @@ namespace PregnancyGrowthTracking.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] CreateUserNoteRequest request)
+        public async Task<IActionResult> Create([FromForm] CreateUserNoteDto request)
         {
             if (request == null)
                 return BadRequest("Invalid request");
 
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            const long maxFileSize = 10485760; // 10 MB
+            if (request.Files != null && request.Files.Count > 0)
+            {
+                foreach (var file in request.Files)
+                {
+                    if (file.Length > maxFileSize)
+                    {
+                        return BadRequest($"File {file.FileName} exceeds the maximum allowed size of 10 MB.");
+                    }
+                }
+            }
+
             var note = new UserNote
             {
                 UserId = request.UserId,
+                Diagnosis = request.Diagnosis,
+                Note = request.Note,
                 Detail = request.Detail,
-                Date = DateOnly.FromDateTime(DateTime.UtcNow)
+                Date = request.Date,
+                UserNotePhoto = null
             };
 
-            if (request.File != null && request.File.Length > 0)
+            if (request.Files != null && request.Files.Count > 0)
             {
-                var photoUrl = await UploadPhotoToS3(request.File);
-                note.UserNotePhoto = photoUrl;
+                var photoUrls = new List<string>();
+                foreach (var file in request.Files)
+                {
+                    if (file.Length > 0)
+                    {
+                        var photoUrl = await UploadPhotoToS3(file);
+                        photoUrls.Add(photoUrl);
+                    }
+                }
+                note.UserNotePhoto = string.Join(",", photoUrls); // Lưu các URL ảnh dưới dạng chuỗi phân cách bằng dấu phẩy
             }
 
             await _userNoteService.AddNoteAsync(note);
@@ -62,11 +91,23 @@ namespace PregnancyGrowthTracking.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] UserNote note)
+        public async Task<IActionResult> Update(int id, [FromBody] UserNote updatedNote)
         {
-            if (id != note.NoteId) return BadRequest("Note ID mismatch");
-            await _userNoteService.UpdateNoteAsync(note);
-            return NoContent();
+            if (updatedNote == null)
+                return BadRequest("Invalid note data.");
+
+            var existingNote = await _userNoteService.GetNoteByIdAsync(id);
+            if (existingNote == null)
+                return NotFound("Note not found.");
+
+           
+            existingNote.Diagnosis = updatedNote.Diagnosis ?? existingNote.Diagnosis;
+            existingNote.Note = updatedNote.Note ?? existingNote.Note;
+            existingNote.Detail = updatedNote.Detail ?? existingNote.Detail;
+            existingNote.UserNotePhoto = updatedNote.UserNotePhoto ?? existingNote.UserNotePhoto;
+
+            await _userNoteService.UpdateNoteAsync(existingNote); // Gọi phương thức cập nhật
+            return Ok(existingNote);
         }
 
         [HttpDelete("{id}")]
@@ -116,13 +157,6 @@ namespace PregnancyGrowthTracking.API.Controllers
 
             await s3Client.PutObjectAsync(request);
             return $"https://{bucketName}.s3.amazonaws.com/{key}";
-        }
-
-        public class CreateUserNoteRequest
-        {
-            public int UserId { get; set; }
-            public string Detail { get; set; }
-            public IFormFile? File { get; set; }
         }
     }
 }

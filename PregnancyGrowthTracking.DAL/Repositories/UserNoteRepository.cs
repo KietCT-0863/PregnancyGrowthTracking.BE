@@ -36,6 +36,11 @@ namespace PregnancyGrowthTracking.DAL.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync(); // Lưu thay đổi vào database
+        }
+
         public async Task DeleteAsync(int noteId)
         {
             var note = await _context.UserNotes.FindAsync(noteId);

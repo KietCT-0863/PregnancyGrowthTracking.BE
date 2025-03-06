@@ -9,10 +9,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using Amazon;
 using PregnancyGrowthTracking.DAL.DTOs;
-<<<<<<< HEAD
-=======
 using Microsoft.EntityFrameworkCore;
->>>>>>> 955c456617a1264d81834dbe6ea3a0be83eea9a7
 using Microsoft.AspNetCore.Authorization;
 
 namespace PregnancyGrowthTracking.API.Controllers

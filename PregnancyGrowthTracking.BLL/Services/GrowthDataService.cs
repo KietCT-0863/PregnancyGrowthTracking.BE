@@ -48,6 +48,11 @@ namespace PregnancyGrowthTracking.BLL.Services
                 throw new KeyNotFoundException("Foetus not found.");
             }
 
+            if (request.HC == null || request.AC == null || request.FL == null || request.EFW == null)
+            {
+                throw new ArgumentException("All measurements (HC, AC, FL, EFW) are required when creating new growth data.");
+            }
+
             // Cập nhật GestationalAge trong bảng Foetus
             await _foetusRepository.UpdateGestationalAgeAsync(foetusId, request.Age);
 

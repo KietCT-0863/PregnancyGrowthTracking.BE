@@ -15,6 +15,11 @@ namespace PregnancyGrowthTracking.BLL.Services
             _noteRepository = noteRepository;
         }
 
+        public async Task<IEnumerable<UserNote>> GetNotesByUserIdAsync(int userId)
+        {
+            return await _noteRepository.GetNotesByUserIdAsync(userId); // Gọi phương thức từ repository
+        }
+
         public async Task<List<UserNote>> GetAllNotesAsync()
         {
             return await _noteRepository.GetAllAsync();

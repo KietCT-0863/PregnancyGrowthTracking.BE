@@ -9,12 +9,12 @@ namespace PregnancyGrwothTracking.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class S3Controller : ControllerBase
+    public class ProfileImgController : ControllerBase
     {
         private readonly IS3Service _s3service;
         private readonly IUserService _userService;
 
-        public S3Controller(IS3Service service, IUserService userService)
+        public ProfileImgController(IS3Service service, IUserService userService)
         {
             _s3service = service;
             _userService = userService;

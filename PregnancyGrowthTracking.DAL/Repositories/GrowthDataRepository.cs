@@ -29,6 +29,7 @@ namespace PregnancyGrowthTracking.DAL.Repositories
             _dbContext.GrowthData.Add(growthData);
             return await _dbContext.SaveChangesAsync() > 0;
         }
+
         public async Task<bool> HasGrowthDataAsync(int foetusId)
         {
             return await _dbContext.GrowthData.AnyAsync(gd => gd.FoetusId == foetusId);
@@ -42,6 +43,7 @@ namespace PregnancyGrowthTracking.DAL.Repositories
                 .OrderBy(gd => gd.Date) // ✅ Sắp xếp theo ngày nhập dữ liệu
                 .ToListAsync();
         }
+
         public async Task<GrowthDatum?> GetGrowthDataByIdAsync(int growthDataId)
         {
             return await _dbContext.GrowthData
@@ -54,6 +56,7 @@ namespace PregnancyGrowthTracking.DAL.Repositories
             _dbContext.GrowthData.Update(growthData);
             return await _dbContext.SaveChangesAsync() > 0;
         }
+
         public async Task<GrowthDatum?> GetGrowthDataByUserAndAgeAsync(int userId, int age)
         {
             return await _dbContext.GrowthData
@@ -61,5 +64,8 @@ namespace PregnancyGrowthTracking.DAL.Repositories
                 .Where(gd => gd.Foetus.UserId == userId && gd.Age == age)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<GrowthDatum?> GetGrowthDataByFoetusIdAndAge(int foetusId, int age)
+            => await _dbContext.GrowthData.FirstOrDefaultAsync(gd => gd.FoetusId == foetusId && gd.Age == age);
     }
 }

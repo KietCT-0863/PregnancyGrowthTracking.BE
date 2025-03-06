@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using Amazon;
 using PregnancyGrowthTracking.DAL.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PregnancyGrowthTracking.API.Controllers
 {

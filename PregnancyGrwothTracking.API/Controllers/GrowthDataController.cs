@@ -20,7 +20,7 @@ namespace PregnancyGrowthTracking.API.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> AddGrowthData(int foetusId, [FromBody] GrowthDataCreateDto request)
+        public async Task<IActionResult> AddOrUpdateGrowthData(int foetusId, [FromBody] GrowthDataDto request)
         {
             if (!ModelState.IsValid)
             {
@@ -28,14 +28,13 @@ namespace PregnancyGrowthTracking.API.Controllers
             }
 
             var userIdClaim = User.FindFirst("UserId");
-            if (userIdClaim == null)
-            {
-                return Unauthorized(new { Message = "Invalid token." });
-            }
+            if (userIdClaim == null) return Unauthorized(new { Message = "Unauthorized." });
+
+            int userId = int.Parse(userIdClaim.Value);
 
             try
             {
-                bool isSaved = await _growthDataService.AddGrowthDataAsync(foetusId, request);
+                var isSaved = await _growthDataService.IsAddOrUpdate(foetusId, userId, request);
                 return isSaved ? Ok(new { Message = "Growth data saved successfully." }) : StatusCode(500, new { Message = "Failed to save data." });
             }
             catch (KeyNotFoundException ex)
@@ -51,6 +50,7 @@ namespace PregnancyGrowthTracking.API.Controllers
                 return StatusCode(500, new { Message = "Internal Server Error.", Error = ex.Message });
             }
         }
+
         [HttpGet]
         [Authorize] // ✅ Chỉ cho phép người dùng đã đăng nhập
         public async Task<IActionResult> GetGrowthDataByFoetusId(int foetusId)
@@ -71,25 +71,26 @@ namespace PregnancyGrowthTracking.API.Controllers
                 return Forbid();
             }
         }
-        [HttpPut("update")]
-        [Authorize]
-        public async Task<IActionResult> UpdateGrowthData([FromBody] GrowthDataUpdateDto request)
-        {
-            var userIdClaim = User.FindFirst("UserId");
-            if (userIdClaim == null) return Unauthorized(new { Message = "Unauthorized." });
 
-            int userId = int.Parse(userIdClaim.Value);
+        //[HttpPut("update")]
+        //[Authorize]
+        //public async Task<IActionResult> UpdateGrowthData([FromBody] GrowthDataDto request)
+        //{
+        //    var userIdClaim = User.FindFirst("UserId");
+        //    if (userIdClaim == null) return Unauthorized(new { Message = "Unauthorized." });
 
-            try
-            {
-                bool updated = await _growthDataService.UpdateGrowthDataAsync(userId, request);
-                return updated ? Ok(new { Message = "Growth data updated successfully." })
-                               : NotFound(new { Message = "Growth data not found or access denied." });
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { Message = ex.Message });
-            }
-        }
+        //    int userId = int.Parse(userIdClaim.Value);
+
+        //    try
+        //    {
+        //        bool updated = await _growthDataService.UpdateGrowthDataAsync(userId, request);
+        //        return updated ? Ok(new { Message = "Growth data updated successfully." })
+        //                       : NotFound(new { Message = "Growth data not found or access denied." });
+        //    }
+        //    catch (KeyNotFoundException ex)
+        //    {
+        //        return NotFound(new { Message = ex.Message });
+        //    }
+        //}
     }
 }

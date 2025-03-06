@@ -12,5 +12,6 @@ namespace PregnancyGrowthTracking.BLL.Services
         Task UpdateNoteAsync(UserNote note);
         Task SaveChangesAsync();
         Task DeleteNoteAsync(int noteId);
+        Task<IEnumerable<UserNote>> GetNotesByUserIdAsync(int userId);
     }
 }

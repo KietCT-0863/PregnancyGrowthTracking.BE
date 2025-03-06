@@ -10,7 +10,9 @@ namespace PregnancyGrowthTracking.DAL.DTOs
 {
     public class CreateUserNoteDto
     {
+        [Required]
         [Range(1, int.MaxValue, ErrorMessage = "UserId must be greater than 0.")]
+        [RegularExpression(@"^\d+$", ErrorMessage = "UserId must contain only numbers.")] 
         public int? UserId { get; set; }
 
         [Required(ErrorMessage = "Date is required")]
@@ -21,7 +23,8 @@ namespace PregnancyGrowthTracking.DAL.DTOs
         public string? Diagnosis { get; set; }
         public string? Note { get; set; }
         public string? Detail { get; set; }
-        public List<IFormFile>? Files { get; set; } 
+        [Required(ErrorMessage = "Photo is required")]
+        public IFormFile? File { get; set; } 
 
         public static ValidationResult ValidateDateNotInFuture(DateOnly? date, ValidationContext context)
         {

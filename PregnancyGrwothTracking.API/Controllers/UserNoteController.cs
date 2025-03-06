@@ -9,6 +9,10 @@ using Microsoft.Extensions.Configuration;
 using System;
 using Amazon;
 using PregnancyGrowthTracking.DAL.DTOs;
+<<<<<<< HEAD
+=======
+using Microsoft.EntityFrameworkCore;
+>>>>>>> 955c456617a1264d81834dbe6ea3a0be83eea9a7
 using Microsoft.AspNetCore.Authorization;
 
 namespace PregnancyGrowthTracking.API.Controllers
@@ -19,20 +23,31 @@ namespace PregnancyGrowthTracking.API.Controllers
     {
         private readonly IUserNoteService _userNoteService;
         private readonly IConfiguration _configuration;
+        private readonly PregnancyGrowthTrackingDbContext _context;
 
-        public UserNoteController(IUserNoteService userNoteService, IConfiguration configuration)
+        public UserNoteController(
+            IUserNoteService userNoteService,
+            IConfiguration configuration,
+            PregnancyGrowthTrackingDbContext context)
         {
             _userNoteService = userNoteService;
             _configuration = configuration;
+            _context = context;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<List<UserNote>>> GetAll()
+        [HttpGet("user/{userId}")]
+        [Authorize(Roles = "vip")]
+        public async Task<IActionResult> GetAll(int userId)
         {
-            return Ok(await _userNoteService.GetAllNotesAsync());
+            var notes = await _userNoteService.GetNotesByUserIdAsync(userId);
+            if (notes == null || !notes.Any())
+                return NotFound("No notes found for this user.");
+
+            return Ok(notes);
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "vip")]
         public async Task<ActionResult<UserNote>> GetById(int id)
         {
             var note = await _userNoteService.GetNoteByIdAsync(id);
@@ -41,6 +56,7 @@ namespace PregnancyGrowthTracking.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "vip")]
         public async Task<IActionResult> Create([FromForm] CreateUserNoteDto request)
         {
             if (request == null)
@@ -51,18 +67,16 @@ namespace PregnancyGrowthTracking.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            const long maxFileSize = 10485760; // 10 MB
-            if (request.Files != null && request.Files.Count > 0)
+            if (request.File == null)
+                return BadRequest("UserNotePhoto is required.");
+
+            const long maxFileSize = 10485760; 
+            if (request.File.Length > maxFileSize)
             {
-                foreach (var file in request.Files)
-                {
-                    if (file.Length > maxFileSize)
-                    {
-                        return BadRequest($"File {file.FileName} exceeds the maximum allowed size of 10 MB.");
-                    }
-                }
+                return BadRequest($"File {request.File.FileName} exceeds the maximum allowed size of 10 MB.");
             }
 
+            
             var note = new UserNote
             {
                 UserId = request.UserId,
@@ -70,70 +84,85 @@ namespace PregnancyGrowthTracking.API.Controllers
                 Note = request.Note,
                 Detail = request.Detail,
                 Date = request.Date,
-                UserNotePhoto = null
+               
             };
-
-            if (request.Files != null && request.Files.Count > 0)
+          
+            if (request.File.Length > 0)
             {
-                var photoUrls = new List<string>();
-                foreach (var file in request.Files)
-                {
-                    if (file.Length > 0)
-                    {
-                        var photoUrl = await UploadPhotoToS3(file);
-                        photoUrls.Add(photoUrl);
-                    }
-                }
-                note.UserNotePhoto = string.Join(",", photoUrls); // Lưu các URL ảnh dưới dạng chuỗi phân cách bằng dấu phẩy
+                var photoUrl = await UploadPhotoToS3(request.File);
+                note.UserNotePhoto = photoUrl; 
             }
-
+           
             await _userNoteService.AddNoteAsync(note);
             return CreatedAtAction(nameof(GetById), new { id = note.NoteId }, note);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] UserNote updatedNote)
-        {
-            if (updatedNote == null)
-                return BadRequest("Invalid note data.");
+        [Authorize(Roles = "vip")]
+        public async Task<IActionResult> Update(int id, [FromForm] UpdateUserNoteDto updatedNote, IFormFile? file)
+        {           
+            if (updatedNote == null && file == null)
+                return BadRequest("No data provided for update.");
 
-            var existingNote = await _userNoteService.GetNoteByIdAsync(id);
+            var existingNote = await _context.UserNotes
+                .Where(n => n.NoteId == id)
+                .Select(n => new UserNote
+                {
+                    NoteId = n.NoteId,
+                    UserId = n.UserId,
+                    Diagnosis = n.Diagnosis,
+                    Note = n.Note,
+                    Detail = n.Detail,
+                    Date = n.Date,
+                    UserNotePhoto = n.UserNotePhoto
+                })
+                .FirstOrDefaultAsync();
+
             if (existingNote == null)
                 return NotFound("Note not found.");
 
-           
-            existingNote.Diagnosis = updatedNote.Diagnosis ?? existingNote.Diagnosis;
-            existingNote.Note = updatedNote.Note ?? existingNote.Note;
-            existingNote.Detail = updatedNote.Detail ?? existingNote.Detail;
-            existingNote.UserNotePhoto = updatedNote.UserNotePhoto ?? existingNote.UserNotePhoto;
+            if (updatedNote != null)
+            {
+                if (!string.IsNullOrEmpty(updatedNote.Diagnosis))
+                    existingNote.Diagnosis = updatedNote.Diagnosis;
 
-            await _userNoteService.UpdateNoteAsync(existingNote); // Gọi phương thức cập nhật
+                if (!string.IsNullOrEmpty(updatedNote.Note))
+                    existingNote.Note = updatedNote.Note;
+
+                if (!string.IsNullOrEmpty(updatedNote.Detail))
+                    existingNote.Detail = updatedNote.Detail;
+            }
+
+            // Upload ảnh mới lên S3 và lấy URL
+            if (file != null)
+            {
+                const long maxFileSize = 10485760; 
+                if (file.Length > maxFileSize)
+                {
+                    return BadRequest($"File {file.FileName} exceeds the maximum allowed size of 10 MB.");
+                }
+
+                var newPhotoUrl = await UploadPhotoToS3(file);
+                existingNote.UserNotePhoto = newPhotoUrl;
+            }
+
+            _context.UserNotes.Update(existingNote);
+            await _context.SaveChangesAsync();
+
             return Ok(existingNote);
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "vip")]
         public async Task<IActionResult> Delete(int id)
         {
+            var note = await _userNoteService.GetNoteByIdAsync(id);
+            if (note == null)
+                return NotFound("Note not found.");
+
+
             await _userNoteService.DeleteNoteAsync(id);
             return NoContent();
-        }
-
-        [HttpPost("upload-photo/{noteId}")]
-        public async Task<IActionResult> UploadPhoto(int noteId, IFormFile file)
-        {
-            if (file == null || file.Length == 0)
-                return BadRequest("Invalid file");
-
-            var photoUrl = await UploadPhotoToS3(file);
-
-            // Cập nhật URL ảnh vào ghi chú
-            var note = await _userNoteService.GetNoteByIdAsync(noteId);
-            if (note == null) return NotFound();
-
-            note.UserNotePhoto = photoUrl;
-            await _userNoteService.UpdateNoteAsync(note);
-
-            return Ok(new { PhotoUrl = photoUrl });
         }
 
         private async Task<string> UploadPhotoToS3(IFormFile file)
@@ -158,6 +187,6 @@ namespace PregnancyGrowthTracking.API.Controllers
 
             await s3Client.PutObjectAsync(request);
             return $"https://{bucketName}.s3.amazonaws.com/{key}";
-        }
+        }       
     }
 }

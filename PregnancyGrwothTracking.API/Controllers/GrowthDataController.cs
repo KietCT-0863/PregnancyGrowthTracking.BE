@@ -35,7 +35,7 @@ namespace PregnancyGrowthTracking.API.Controllers
 
             try
             {
-                var isSaved = await _growthDataService.IsAddOrUpdate(foetusId, userId, request);
+                bool isSaved = await _growthDataService.IsAddOrUpdate(foetusId, userId, request);
                 if (!isSaved)
                 {
                     return StatusCode(500, new { Message = "Failed to save data." });
@@ -49,7 +49,7 @@ namespace PregnancyGrowthTracking.API.Controllers
                 {
                     Message = "Growth data saved successfully.",
                     Alerts = alerts,
-                    HasWarnings = alerts.Any(x => x.Value.IsAlert)
+                    //HasWarnings = alerts.Any(x => x.Value.IsAlert)
                 };
 
                 return Ok(response);

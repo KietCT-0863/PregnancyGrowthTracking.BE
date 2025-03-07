@@ -148,7 +148,7 @@ namespace PregnancyGrowthTracking.BLL.Services
 
                 alerts["HC"] = new GrowthDataAlertDTO
                 {
-                    IsAlert = growthData.HC.Value < hcRangeMin && growthData.HC.Value > hcRangeMax,
+                    IsAlert = hcRangeMin < growthData.HC.Value && growthData.HC.Value < hcRangeMax,
                     CurrentValue = growthData.HC.Value,
                     MinRange = hcRangeMin,
                     MaxRange = hcRangeMax
@@ -162,7 +162,7 @@ namespace PregnancyGrowthTracking.BLL.Services
                 double acRangeMax = growthStandard.AcMedian.Value * 1.1;
                 alerts["AC"] = new GrowthDataAlertDTO
                 {
-                    IsAlert = growthData.AC.Value < acRangeMin && growthData.AC.Value > acRangeMax,
+                    IsAlert = acRangeMin < growthData.AC.Value && growthData.AC.Value < acRangeMax,
                     CurrentValue = growthData.AC.Value,
                     MinRange = acRangeMin,
                     MaxRange = acRangeMax
@@ -176,7 +176,7 @@ namespace PregnancyGrowthTracking.BLL.Services
                 double flRangeMax = growthStandard.FlMedian.Value * 1.1;
                 alerts["FL"] = new GrowthDataAlertDTO
                 {
-                    IsAlert = growthData.FL.Value < flRangeMin && growthData.FL.Value > flRangeMax,
+                    IsAlert = flRangeMin < growthData.FL.Value && growthData.FL.Value < flRangeMax,
                     CurrentValue = growthData.FL.Value,
                     MinRange = flRangeMin,
                     MaxRange = flRangeMax
@@ -190,7 +190,7 @@ namespace PregnancyGrowthTracking.BLL.Services
                 double efwRangeMax = growthStandard.EfwMedian.Value * 1.1;
                 alerts["EFW"] = new GrowthDataAlertDTO
                 {
-                    IsAlert = growthData.EFW.Value < efwRangeMin && growthData.EFW.Value > efwRangeMax,
+                    IsAlert = efwRangeMin < growthData.EFW.Value && growthData.EFW.Value < efwRangeMax,
                     CurrentValue = growthData.EFW.Value,
                     MinRange = efwRangeMin,
                     MaxRange = efwRangeMax

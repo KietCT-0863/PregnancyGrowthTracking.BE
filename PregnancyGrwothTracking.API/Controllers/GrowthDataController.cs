@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PregnancyGrowthTracking.BLL.Services;
 using PregnancyGrowthTracking.DAL.DTOs;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PregnancyGrowthTracking.API.Controllers
@@ -35,7 +36,23 @@ namespace PregnancyGrowthTracking.API.Controllers
             try
             {
                 var isSaved = await _growthDataService.IsAddOrUpdate(foetusId, userId, request);
-                return isSaved ? Ok(new { Message = "Growth data saved successfully." }) : StatusCode(500, new { Message = "Failed to save data." });
+                if (!isSaved)
+                {
+                    return StatusCode(500, new { Message = "Failed to save data." });
+                }
+
+                // Kiểm tra các chỉ số và trả về cảnh báo
+                var alerts = await _growthDataService.AlertReturnWithRange(request);
+                
+                // Tạo response object
+                var response = new
+                {
+                    Message = "Growth data saved successfully.",
+                    Alerts = alerts,
+                    HasWarnings = alerts.Any(x => x.Value.IsAlert)
+                };
+
+                return Ok(response);
             }
             catch (KeyNotFoundException ex)
             {

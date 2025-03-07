@@ -36,7 +36,7 @@ namespace PregnancyGrowthTracking.DAL.Repositories
             return true;
         }
 
-        public async Task<GrowthStandard?> GetGrowthStandardByAgeAsync(int? gestationalAge)
+        public async Task<GrowthStandard> GetGrowthStandardByAgeAsync(int? gestationalAge)
         {
             _dbContext = new();
             return await _dbContext.GrowthStandards.FirstOrDefaultAsync(gs => gs.GestationalAge == gestationalAge);

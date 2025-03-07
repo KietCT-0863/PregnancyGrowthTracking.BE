@@ -129,5 +129,75 @@ namespace PregnancyGrowthTracking.BLL.Services
 
             return await _growthDataRepository.UpdateGrowthDataAsync(growthData);
         }
+
+        public async Task<Dictionary<string, GrowthDataAlertDTO>> AlertReturnWithRange(GrowthDataDto growthData)
+        {
+            GrowthStandard? growthStandard = await _growthStandardRepository.GetGrowthStandardByAgeAsync(growthData.Age);
+            if (growthStandard == null)
+            {
+                throw new KeyNotFoundException($"Growth standard not found for age {growthData.Age}");
+            }
+
+            var alerts = new Dictionary<string, GrowthDataAlertDTO>();
+
+            // Kiểm tra HC (Head Circumference)
+            if (growthData.HC.HasValue && growthStandard.HcMedian.HasValue)
+            {
+                double hcRangeMin = growthStandard.HcMedian.Value * 0.9;
+                double hcRangeMax = growthStandard.HcMedian.Value * 1.1;
+
+                alerts["HC"] = new GrowthDataAlertDTO
+                {
+                    IsAlert = growthData.HC.Value < hcRangeMin && growthData.HC.Value > hcRangeMax,
+                    CurrentValue = growthData.HC.Value,
+                    MinRange = hcRangeMin,
+                    MaxRange = hcRangeMax
+                };
+            }
+
+            // Kiểm tra AC (Abdominal Circumference)
+            if (growthData.AC.HasValue && growthStandard.AcMedian.HasValue)
+            {
+                double acRangeMin = growthStandard.AcMedian.Value * 0.9;
+                double acRangeMax = growthStandard.AcMedian.Value * 1.1;
+                alerts["AC"] = new GrowthDataAlertDTO
+                {
+                    IsAlert = growthData.AC.Value < acRangeMin && growthData.AC.Value > acRangeMax,
+                    CurrentValue = growthData.AC.Value,
+                    MinRange = acRangeMin,
+                    MaxRange = acRangeMax
+                };
+            }
+
+            // Kiểm tra FL (Femur Length)
+            if (growthData.FL.HasValue && growthStandard.FlMedian.HasValue)
+            {
+                double flRangeMin = growthStandard.FlMedian.Value * 0.9;
+                double flRangeMax = growthStandard.FlMedian.Value * 1.1;
+                alerts["FL"] = new GrowthDataAlertDTO
+                {
+                    IsAlert = growthData.FL.Value < flRangeMin && growthData.FL.Value > flRangeMax,
+                    CurrentValue = growthData.FL.Value,
+                    MinRange = flRangeMin,
+                    MaxRange = flRangeMax
+                };
+            }
+
+            // Kiểm tra EFW (Estimated Fetal Weight)
+            if (growthData.EFW.HasValue && growthStandard.EfwMedian.HasValue)
+            {
+                double efwRangeMin = growthStandard.EfwMedian.Value * 0.9;
+                double efwRangeMax = growthStandard.EfwMedian.Value * 1.1;
+                alerts["EFW"] = new GrowthDataAlertDTO
+                {
+                    IsAlert = growthData.EFW.Value < efwRangeMin && growthData.EFW.Value > efwRangeMax,
+                    CurrentValue = growthData.EFW.Value,
+                    MinRange = efwRangeMin,
+                    MaxRange = efwRangeMax
+                };
+            }
+
+            return alerts;
+        }
     }
 }

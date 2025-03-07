@@ -15,6 +15,8 @@ namespace PregnancyGrowthTracking.BLL.Services
 
         Task<bool> UpdateGrowthDataAsync(int userId, GrowthDataDto request);
 
+        Task<Dictionary<string, GrowthDataAlertDTO>> AlertReturnWithRange(GrowthDataDto growthData);
+
     }
 }
 

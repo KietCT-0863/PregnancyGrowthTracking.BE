@@ -67,5 +67,6 @@ namespace PregnancyGrowthTracking.DAL.Repositories
 
         public async Task<GrowthDatum?> GetGrowthDataByFoetusIdAndAge(int foetusId, int age)
             => await _dbContext.GrowthData.FirstOrDefaultAsync(gd => gd.FoetusId == foetusId && gd.Age == age);
+
     }
 }

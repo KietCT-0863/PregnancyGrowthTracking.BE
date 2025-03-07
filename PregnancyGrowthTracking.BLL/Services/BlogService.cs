@@ -44,7 +44,7 @@ namespace PregnancyGrowthTracking.BLL.Services
                 Id = b.BlogId,
                 Title = b.Title,
                 Body = b.Body,
-
+                BlogImageUrl = b.BlogImageUrl,
                 // với mỗi category trong BlogCate sẽ tương ứng với 1 category trong Categories
                 Categories = b.BlogCates.Select(bc => new BlogDTO.BlogCategoryDTO
                 {
@@ -55,7 +55,7 @@ namespace PregnancyGrowthTracking.BLL.Services
             return listBlogDTO;
         }
 
-        public async Task UpdateBlogAsync(BlogDTO blogDTO)
+        public async Task UpdateBlogAsync(UpdateBlogDTO blogDTO)
         {
             Blog existingBlog = await _blogRepo.GetBlogByIdAsync(blogDTO.Id);
 
@@ -78,7 +78,7 @@ namespace PregnancyGrowthTracking.BLL.Services
             }
         }
 
-        public async Task UpdateBlogCateAsync(BlogDTO blogDTO)
+        public async Task UpdateBlogCateAsync(UpdateBlogDTO blogDTO)
         {
             Blog existingBlog = await _blogRepo.GetBlogByIdAsync(blogDTO.Id);
             Category? currentCate = null;
@@ -129,7 +129,7 @@ namespace PregnancyGrowthTracking.BLL.Services
 
             Blog newBlog = await _blogRepo.GetBlogByTitleAndBodyAsync(blog.Title, blog.Body);
 
-            foreach (var blogcate in blogDTO.Categories)
+            foreach (var blogcate in blogDTO.CreateBlogCategories)
             {
                 Category newCate = await _cateRepo.GetCategoryByName(blogcate.CategoryName);
                 BlogCate newBlogCate = new BlogCate
@@ -177,7 +177,7 @@ namespace PregnancyGrowthTracking.BLL.Services
                 Id = blog.BlogId,
                 Title = blog.Title,
                 Body = blog.Body,
-                BlogImageUrl = blog.BlogImageUrl,
+                //BlogImageUrl = blog.BlogImageUrl,
                 Categories = blog.BlogCates.Select(bc => new BlogDTO.BlogCategoryDTO
                 {
                     CategoryName = bc.Category.CategoryName

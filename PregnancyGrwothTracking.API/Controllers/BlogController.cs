@@ -32,9 +32,9 @@ namespace PregnancyGrowthTracking.API.Controllers
         {
             try
             {
-                var blogs = await _blogService.GetAllBlogWithCateAsync();
+                List<BlogDTO> blogs = await _blogService.GetAllBlogWithCateAsync();
 
-                // Apply Nested JSON
+                // Nested Json - Json lồng nhau
                 var result = new
                 {
                     posts = blogs.Select(b => new ReturnBlogDTO
@@ -42,6 +42,7 @@ namespace PregnancyGrowthTracking.API.Controllers
                         Id = b.Id,
                         Title = b.Title,
                         Body = b.Body,
+                        BlogImageUrl = b.BlogImageUrl,
                         Categories = b.Categories.Select(c => c.CategoryName).ToList()
                     })
                 };
@@ -55,7 +56,7 @@ namespace PregnancyGrowthTracking.API.Controllers
 
         [HttpPut]
         [Authorize(Roles = "admin")]
-        public async Task<IActionResult> UpdateBlog([FromBody] BlogDTO blogDTO)
+        public async Task<IActionResult> UpdateBlog([FromBody] UpdateBlogDTO blogDTO)
         {
             try
             {
@@ -73,7 +74,7 @@ namespace PregnancyGrowthTracking.API.Controllers
         }
 
         [HttpPost]
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> AddBlog([FromBody] CreateBlogDTO createBlogDTO)
         {
             try
@@ -88,6 +89,7 @@ namespace PregnancyGrowthTracking.API.Controllers
         }
 
         [HttpDelete()]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteBlog(int blogID)
         {
             try
@@ -98,7 +100,7 @@ namespace PregnancyGrowthTracking.API.Controllers
                 }
 
                 await _blogService.DeleteBlogAsync(blogID);
-                return Ok("Blog deleted successfully.");
+                return Ok("Xoá Blog thành công.");
             }
             catch (Exception)
             {
@@ -107,6 +109,7 @@ namespace PregnancyGrowthTracking.API.Controllers
         }
 
         [HttpPost("upload-photo/{blogId}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> UploadPhoto(int blogId, IFormFile file)
         {
             try
@@ -145,6 +148,7 @@ namespace PregnancyGrowthTracking.API.Controllers
         }
 
         [HttpPut("replace-photo/{blogId}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> ReplacePhoto(int blogId, IFormFile file)
         {
             try

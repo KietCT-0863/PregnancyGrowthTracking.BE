@@ -10,6 +10,7 @@ namespace PregnancyGrowthTracking.DAL.DTOs
         public string Title { get; set; } = null!;
         public string Body { get; set; } = null!;
         public List<BlogCategoryDTO> Categories { get; set; } = new();
+        public string BlogImageUrl { get; set; }
 
         public class BlogCategoryDTO
         {

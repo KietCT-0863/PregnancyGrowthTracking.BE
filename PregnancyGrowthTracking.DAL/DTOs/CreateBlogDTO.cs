@@ -9,6 +9,7 @@ namespace PregnancyGrowthTracking.DAL.DTOs
 {
     public class CreateBlogDTO
     {
+
         [Required(ErrorMessage = "Blog Title không được để trống.")]
         public string Title { get; set; } = null!;
 

@@ -17,7 +17,7 @@ namespace PregnancyGrwothTracking.API.Controllers
     public class PaymentController : ControllerBase
     {
         private readonly IVnPayService _vnPayService;
-        private readonly PregnancyGrowthTrackingDbContext _context;
+        private readonly PregnancyGrowthTrackingDbContext _dbContext;
         private readonly ILogger<PaymentController> _logger;
         private readonly IConfiguration _configuration;
 
@@ -27,7 +27,7 @@ namespace PregnancyGrwothTracking.API.Controllers
             IConfiguration configuration)
         {
             _vnPayService = vnPayService;
-            _context = context;
+            _dbContext = context;
             _logger = logger;
             _configuration = configuration;
         }
@@ -37,14 +37,14 @@ namespace PregnancyGrwothTracking.API.Controllers
         {
             try
             {
-                var membership = await _context.Memberships
+                var membership = await _dbContext.Memberships
                     .FirstOrDefaultAsync(m => m.MembershipId == model.MembershipId);
 
                 if (membership == null)
                     return NotFound("Membership not found");
 
                 // Kiểm tra user tồn tại
-                var user = await _context.Users.FindAsync(model.UserId);
+                var user = await _dbContext.Users.FindAsync(model.UserId);
                 if (user == null)
                     return NotFound("User not found");
 
@@ -103,7 +103,7 @@ namespace PregnancyGrwothTracking.API.Controllers
 
                     _logger.LogInformation($"Parsed MembershipId: {membershipId}, UserId: {userId}");
 
-                    var membership = await _context.Memberships.FindAsync(membershipId);
+                    var membership = await _dbContext.Memberships.FindAsync(membershipId);
                     if (membership == null)
                     {
                         return BadRequest(new { Success = false, Message = "Membership not found" });
@@ -124,16 +124,16 @@ namespace PregnancyGrwothTracking.API.Controllers
                     };
 
 
-                    _context.Payments.Add(payment);
+                    _dbContext.Payments.Add(payment);
 
-                    var user = await _context.Users.FindAsync(userId);
+                    var user = await _dbContext.Users.FindAsync(userId);
                     if (user != null && user.RoleId == 3)
                     {
                         user.RoleId = 2;
-                        _context.Users.Update(user);
+                        _dbContext.Users.Update(user);
                     }
 
-                    await _context.SaveChangesAsync();
+                    await _dbContext.SaveChangesAsync();
 
                     return Ok(new
                     {
@@ -175,7 +175,7 @@ namespace PregnancyGrwothTracking.API.Controllers
         {
             try
             {
-                var user = await _context.Users.FindAsync(userId);
+                var user = await _dbContext.Users.FindAsync(userId);
                 if (user == null)
                 {
                     return NotFound(new { Success = false, Message = "Người dùng không tồn tại." });
@@ -196,7 +196,7 @@ namespace PregnancyGrwothTracking.API.Controllers
         {
             try
             {
-                var payments = await _context.Payments
+                var payments = await _dbContext.Payments
                     .Where(p => p.UserId == userId)
                     .Include(p => p.Membership)
                     .OrderByDescending(p => p.Date)
@@ -230,7 +230,7 @@ namespace PregnancyGrwothTracking.API.Controllers
         {
             try
             {
-                var payment = await _context.Payments
+                var payment = await _dbContext.Payments
                     .Include(p => p.Membership)
                     .FirstOrDefaultAsync(p => p.PaymentId == paymentId && p.UserId == userId);
 
@@ -253,6 +253,22 @@ namespace PregnancyGrwothTracking.API.Controllers
             catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        
+        [HttpGet("total-payment")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> GetTotalPaymentAmount()
+        {
+            try
+            {
+                var totalAmount = await _dbContext.Payments.SumAsync(p => p.TotalPrice);
+                return Ok(new { TotalPaymentAmount = totalAmount });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while calculating the total payment amount: {ex.Message}");
             }
         }
     }

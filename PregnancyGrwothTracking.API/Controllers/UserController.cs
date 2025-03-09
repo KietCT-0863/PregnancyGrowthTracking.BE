@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PregnancyGrowthTracking.BLL.Services;
 using PregnancyGrowthTracking.DAL.DTOs;
+using PregnancyGrowthTracking.DAL.Entities;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -13,10 +15,12 @@ namespace PregnancyGrowthTracking.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly PregnancyGrowthTrackingDbContext _dbContext;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, PregnancyGrowthTrackingDbContext context)
         {
             _userService = userService;
+            _dbContext = context;
         }
 
         //  Get all users (Chỉ Admin mới có quyền truy cập)
@@ -113,8 +117,30 @@ namespace PregnancyGrowthTracking.API.Controllers
             return Ok(users);
         }
 
+        //Đếm tổng số user có trong hệ thống trừ admin
+        [HttpGet("count-total-users")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> CountUsersByRole()
+        {
+            try
+            {
+                var countRole2 = await _dbContext.Users.CountAsync(u => u.RoleId == 2);
+                var countRole3 = await _dbContext.Users.CountAsync(u => u.RoleId == 3);
 
+                var totalUsers = countRole2 + countRole3;
 
-
+                return Ok(new
+                {
+                    TotalUsers = totalUsers
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while counting users: {ex.Message}");
+            }
+        }
     }
+
+
 }
+

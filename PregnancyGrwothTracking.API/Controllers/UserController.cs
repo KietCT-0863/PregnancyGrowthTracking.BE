@@ -139,8 +139,36 @@ namespace PregnancyGrowthTracking.API.Controllers
                 return StatusCode(500, $"An error occurred while counting users: {ex.Message}");
             }
         }
+
+        [HttpGet("monthly-user-count")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> GetMonthlyUserCount()
+        {
+            try
+            {
+                // Nhóm người dùng theo tháng và năm
+                var monthlyUserCount = await _dbContext.Users
+                    .Where(u => u.RoleId == 2 || u.RoleId == 3) 
+                    .GroupBy(u => new { u.CreatedAt.Year, u.CreatedAt.Month }) // Nhóm theo năm và tháng
+                    .Select(g => new
+                    {
+                        Year = g.Key.Year,
+                        Month = g.Key.Month,
+                        TotalUsers = g.Count()
+                    })
+                    .OrderBy(r => r.Year)
+                    .ThenBy(r => r.Month)
+                    .ToListAsync();
+
+                return Ok(monthlyUserCount);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while calculating monthly user count: {ex.Message}");
+            }
+        }
+
+
     }
-
-
 }
 

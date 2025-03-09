@@ -271,5 +271,33 @@ namespace PregnancyGrwothTracking.API.Controllers
                 return StatusCode(500, $"An error occurred while calculating the total payment amount: {ex.Message}");
             }
         }
+
+        [HttpGet("monthly-revenue-list")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> GetMonthlyRevenueList()
+        {
+            try
+            {
+                // Nhóm các thanh toán theo tháng và năm, sau đó tính tổng TotalPrice
+                var monthlyRevenueList = await _dbContext.Payments
+                    .Where(p => p.Date.HasValue) // Lọc các bản ghi có PaymentDate không null
+                    .GroupBy(p => new { p.Date.Value.Year, p.Date.Value.Month }) // Sử dụng Value để truy cập Year và Month
+                    .Select(g => new
+                    {
+                        Year = g.Key.Year,
+                        Month = g.Key.Month,
+                        TotalRevenue = g.Sum(p => p.TotalPrice)
+                    })
+                    .OrderBy(r => r.Year)
+                    .ThenBy(r => r.Month)
+                    .ToListAsync();
+
+                return Ok(monthlyRevenueList);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while calculating monthly revenue list: {ex.Message}");
+            }
+        }
     }
 }

@@ -12,12 +12,14 @@ namespace PregnancyGrowthTracking.BLL.Services
         private readonly IGrowthDataRepository _growthDataRepository;
         private readonly IFoetusRepository _foetusRepository;
         private readonly IGrowthStandardRepository _growthStandardRepository;
+        private readonly IFoetusService _foetusService;
 
-        public GrowthDataService(IGrowthDataRepository growthDataRepository, IFoetusRepository foetusRepository, IGrowthStandardRepository growthStandardRepository)
+        public GrowthDataService(IGrowthDataRepository growthDataRepository, IFoetusRepository foetusRepository, IGrowthStandardRepository growthStandardRepository, IFoetusService foetusService)
         {
             _growthDataRepository = growthDataRepository;
             _foetusRepository = foetusRepository;
             _growthStandardRepository = growthStandardRepository;
+            _foetusService = foetusService;
         }
 
         public async Task<bool> IsAddOrUpdate(int foetusId, int userId, GrowthDataDto request)
@@ -53,6 +55,11 @@ namespace PregnancyGrowthTracking.BLL.Services
                 throw new ArgumentException("All measurements (HC, AC, FL, EFW) are required when creating new growth data.");
             }
 
+            if (await _growthDataRepository.GetGrowthDataByIdAsync(foetusId) == null)
+            {
+                await _foetusService.AutoGenerateExpectedBirthDate(foetusId, request.Age);
+            }
+
             // Cập nhật GestationalAge trong bảng Foetus
             await _foetusRepository.UpdateGestationalAgeAsync(foetusId, request.Age);
 
@@ -62,13 +69,11 @@ namespace PregnancyGrowthTracking.BLL.Services
                 throw new ArgumentException("No growth standard found for the given age.");
             }
 
-            // Kiểm tra nếu đây là lần nhập dữ liệu đầu tiên
             bool hasExistingData = await _growthDataRepository.HasGrowthDataAsync(foetusId);
 
             if (!hasExistingData && foetus.ExpectedBirthDate == null)
             {
-                DateTime expectedBirthDate = DateTime.UtcNow.AddDays((40 - request.Age) * 7);
-                await _foetusRepository.UpdateExpectedBirthDateAsync(foetusId, expectedBirthDate);
+                await _foetusService.AutoGenerateExpectedBirthDate(foetusId, request.Age);
             }
 
             var growthData = new GrowthDatum

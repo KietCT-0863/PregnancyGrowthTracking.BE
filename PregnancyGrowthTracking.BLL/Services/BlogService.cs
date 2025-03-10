@@ -45,7 +45,6 @@ namespace PregnancyGrowthTracking.BLL.Services
                 Title = b.Title,
                 Body = b.Body,
                 BlogImageUrl = b.BlogImageUrl,
-                // với mỗi category trong BlogCate sẽ tương ứng với 1 category trong Categories
                 Categories = b.BlogCates.Select(bc => new BlogDTO.BlogCategoryDTO
                 {
                     CategoryName = bc.Category.CategoryName

@@ -69,6 +69,7 @@ namespace PregnancyGrowthTracking.BLL.Services
                 throw new ArgumentException("No growth standard found for the given age.");
             }
 
+            // NẾU ĐÂY LÀ LẦN NHẬP ĐẦU TIÊN THÌ HỆ THỐNG TỰ ĐỘNG GENERATE RA NGÀY DỰ SINH VÀ LƯU VÀO BẢNG FOETUS
             bool hasExistingData = await _growthDataRepository.HasGrowthDataAsync(foetusId);
 
             if (!hasExistingData && foetus.ExpectedBirthDate == null)

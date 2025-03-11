@@ -57,89 +57,95 @@ namespace PregnancyGrowthTracking.BLL.Services
             string subject = $"🔔 Tạo lời nhắc thành công: {createdReminder.Title}";
 
             string body = $@"
-<html>
+<!DOCTYPE html>
+<html lang='vi'>
 <head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>✅ Nhắc Nhở Đã Được Tạo Thành Công!</title>
     <style>
         body {{
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f9f9;
             padding: 20px;
+            margin: 0;
         }}
         .email-container {{
             background-color: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
             max-width: 600px;
             margin: auto;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
             text-align: center;
+            border: 1px solid #e0e0e0;
         }}
         .header {{
-            font-size: 22px;
+            font-size: 24px;
             font-weight: bold;
             color: #2E7D32;
-            margin-bottom: 10px;
+            padding: 15px;
+            background-color: #E8F5E9;
+            border-radius: 10px 10px 0 0;
         }}
         .content {{
             font-size: 16px;
-            color: #333;
+            color: #444;
             line-height: 1.6;
             text-align: left;
+            padding: 15px;
         }}
         .info-box {{
-            background-color: #e8f5e9;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
+            background-color: #f0f8ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
             text-align: left;
-        }}
-        .info-box strong {{
-            color: #1B5E20;
-        }}
-        .footer {{
-            font-size: 14px;
-            color: #777;
-            margin-top: 20px;
+            border-left: 5px solid #2196F3;
         }}
         .button {{
-            background-color: #2E7D32;
+            display: inline-block;
+            background-color: #42A5F5;
             color: white;
             padding: 12px 20px;
             text-decoration: none;
             border-radius: 5px;
             font-size: 16px;
-            display: inline-block;
+            font-weight: bold;
             margin-top: 20px;
+            transition: background 0.3s ease;
         }}
         .button:hover {{
-            background-color: #1B5E20;
+            background-color: #1E88E5;
+        }}
+        .footer {{
+            font-size: 14px;
+            color: #777;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
         }}
     </style>
 </head>
 <body>
     <div class='email-container'>
-        <p class='header'>✅ Lời nhắc đã được tạo thành công!</p>
-        <p class='content'>
-            Xin chào <strong>{user.FullName}</strong>,<br>
-            Bạn vừa tạo một lời nhắc thành công trên hệ thống <strong>Pregnancy Growth Tracking</strong>.
-        </p>
-        <div class='info-box'>
-            <p><strong>📌 Tiêu đề:</strong> {createdReminder.Title}</p>
-            <p><strong>📖 Nội dung:</strong> {createdReminder.Notification}</p>
-            <p><strong>🗂️ Loại nhắc nhở:</strong> {createdReminder.ReminderType}</p>
-            <p><strong>🗓️ Thời gian:</strong> {createdReminder.Time} ngày {createdReminder.Date:dd/MM/yyyy}</p>
+        <div class='header'>✅ Nhắc Nhở Đã Được Tạo Thành Công!</div>
+        <div class='content'>
+            <p>Xin chào <strong>{user.FullName}</strong>,</p>
+            <p>Bạn vừa tạo một lời nhắc thành công trên hệ thống <strong>Pregnancy Growth Tracking</strong>.</p>
+            <div class='info-box'>
+                <p><strong>📌 Tiêu đề:</strong> {createdReminder.Title}</p>
+                <p><strong>📖 Nội dung:</strong> {createdReminder.Notification}</p>
+                <p><strong>🗂️ Loại nhắc nhở:</strong> {createdReminder.ReminderType}</p>
+                <p><strong>🗓️ Ngày:</strong> {createdReminder.Date:dd/MM/yyyy}</p>
+                <p><strong>⏰ Giờ:</strong> {createdReminder.Time}</p>
+            </div>
+            <a class='button' href='https://your-website.com/reminders/{createdReminder.RemindId}'>📅 Xem chi tiết</a>
         </div>
-        <p class='content'>
-            Hệ thống sẽ gửi nhắc nhở cho bạn khi đến thời gian đã đặt. Vui lòng kiểm tra hộp thư của bạn!
-        </p>
-        <a class='button' href='https://your-website.com/reminders/{createdReminder.RemindId}'>Xem chi tiết</a>
-        <p class='footer'>
-            🤰 <strong>Pregnancy Growth Tracking</strong> luôn đồng hành cùng bạn trong hành trình làm mẹ!<br>
-            <i>Liên hệ với chúng tôi nếu bạn cần hỗ trợ.</i>
-        </p>
+        <p class='footer'>🤰<strong>Pregnancy Growth Tracking</strong> luôn đồng hành cùng bạn trong hành trình làm mẹ!</p>
     </div>
 </body>
 </html>";
+
 
 
             bool emailSent = await _emailService.SendEmailAsync(user.Email, subject, body);

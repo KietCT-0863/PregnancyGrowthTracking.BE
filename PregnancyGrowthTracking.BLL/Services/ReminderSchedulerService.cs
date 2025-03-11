@@ -71,21 +71,111 @@ namespace PregnancyGrowthTracking.BLL.Services
 
                             Console.WriteLine($"📧 [SENDING] Sending email to {user.Email} for Reminder: {reminder.Title}");
 
-                            string subject = $"🔔 Nhắc nhở trước 1 tiếng: {reminder.Title}";
+                            string subject = $"⏳ Nhắc nhở trước 1 tiếng: {reminder.Title}";
                             string body = $@"
-                            <html>
-                            <body style='font-family: Arial, sans-serif; background-color: #f0f8ff; padding: 20px;'>
-                                <div style='background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); max-width: 600px; margin: auto; text-align: center;'>
-                                    <p style='font-size: 22px; font-weight: bold; color: #1976D2;'>⏳ Nhắc nhở quan trọng!</p>
-                                    <p>Xin chào <strong>{user.FullName}</strong>,</p>
-                                    <p><strong>📌 Tiêu đề:</strong> {reminder.Title}</p>
-                                    <p><strong>📖 Nội dung:</strong> {reminder.Notification}</p>
-                                    <p><strong>🗓️ Ngày:</strong> {reminder.Date:dd/MM/yyyy}</p>
-                                    <p><strong>🕒 Giờ:</strong> {reminder.Time}</p>
-                                    <a href='https://your-website.com/reminders/{reminder.RemindId}' style='display: inline-block; background-color: #FF9800; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-size: 16px; font-weight: bold;'>Xem chi tiết</a>
-                                </div>
-                            </body>
-                            </html>";
+<!DOCTYPE html>
+<html lang='vi'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>⏳ Nhắc Nhở Quan Trọng</title>
+    <style>
+        body {{
+            font-family: 'Arial', sans-serif;
+            background-color: #fff3e0;
+            margin: 0;
+            padding: 20px;
+        }}
+        .email-container {{
+            background-color: #ffffff;
+            max-width: 600px;
+            margin: auto;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border: 1px solid #ffcc80;
+        }}
+        .header {{
+            font-size: 24px;
+            font-weight: bold;
+            color: #e65100;
+            padding: 15px;
+            background-color: #ffe0b2;
+            border-radius: 10px 10px 0 0;
+        }}
+        .content {{
+            font-size: 16px;
+            color: #444;
+            line-height: 1.6;
+            text-align: left;
+            padding: 15px;
+        }}
+        .info-box {{
+            background-color: #fff8e1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: left;
+            border-left: 5px solid #ff9800;
+        }}
+        .info-box strong {{
+            color: #e65100;
+        }}
+        .button {{
+            display: inline-block;
+            background-color: #ff9800;
+            color: white;
+            padding: 12px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: background 0.3s ease;
+        }}
+        .button:hover {{
+            background-color: #f57c00;
+        }}
+        .footer {{
+            font-size: 14px;
+            color: #777;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }}
+        .highlight {{
+            font-weight: bold;
+            color: #e65100;
+        }}
+    </style>
+</head>
+<body>
+    <div class='email-container'>
+        <div class='header'>⏳ Nhắc Nhở Quan Trọng!</div>
+
+        <div class='content'>
+            <p>Xin chào <strong>{user.FullName}</strong>,</p>
+            <p>Bạn có một nhắc nhở quan trọng trong vòng <strong>1 giờ tới</strong>. Hãy kiểm tra chi tiết bên dưới:</p>
+
+            <div class='info-box'>
+                <p><strong>📌 Tiêu đề:</strong> {reminder.Title}</p>
+                <p><strong>📖 Nội dung:</strong> {reminder.Notification}</p>
+                <p><strong>🗓️ Ngày:</strong> {reminder.Date:dd/MM/yyyy}</p>
+                <p><strong>⏰ Giờ:</strong> {reminder.Time}</p>
+            </div>
+
+            <p>Hãy sẵn sàng và đảm bảo bạn không bỏ lỡ!</p>
+
+            <a class='button' href='https://your-website.com/reminders/{reminder.RemindId}'>📅 Xem chi tiết</a>
+        </div>
+
+        <p class='footer'>
+             <strong>Pregnancy Growth Tracking</strong> giúp bạn luôn nhớ các sự kiện quan trọng!<br>
+            <i>Liên hệ với chúng tôi nếu bạn cần hỗ trợ.</i>
+        </p>
+    </div>
+</body>
+</html>";
 
                             bool emailSent = await emailService.SendEmailAsync(user.Email, subject, body);
 

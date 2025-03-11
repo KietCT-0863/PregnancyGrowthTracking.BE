@@ -11,6 +11,8 @@ using Amazon;
 using PregnancyGrowthTracking.DAL.DTOs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using System.Linq.Expressions;
 
 namespace PregnancyGrowthTracking.API.Controllers
 {
@@ -36,11 +38,29 @@ namespace PregnancyGrowthTracking.API.Controllers
         [Authorize(Roles = "vip")]
         public async Task<IActionResult> GetAll(int userId)
         {
-            var notes = await _userNoteService.GetNotesByUserIdAsync(userId);
-            if (notes == null || !notes.Any())
-                return NotFound("No notes found for this user.");
+            try
+            {
+                var userIdClaim = User.FindFirst("UserId")?.Value;
+                if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var currentUserId))
+                {
+                    return BadRequest("Invalid user ID in token.");
+                }
 
-            return Ok(notes);
+                if (currentUserId != userId)
+                {
+                    return Ok(new { Message = "You do not have permission to access." });
+                }
+
+                var notes = await _userNoteService.GetNotesByUserIdAsync(userId);
+                if (notes == null || !notes.Any())
+                    return NotFound("No notes found for this user.");
+
+                return Ok(notes);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
         }
 
         [HttpGet("{id}")]

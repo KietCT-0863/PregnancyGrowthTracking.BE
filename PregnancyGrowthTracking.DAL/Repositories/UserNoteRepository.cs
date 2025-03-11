@@ -14,6 +14,13 @@ namespace PregnancyGrowthTracking.DAL.Repositories
             _context = context;
         }
 
+        public async Task<IEnumerable<UserNote>> GetNotesByUserIdAsync(int userId)
+        {
+            return await _context.UserNotes
+                .Where(n => n.UserId == userId)
+                .ToListAsync(); 
+        }
+
         public async Task<List<UserNote>> GetAllAsync()
         {
             return await _context.UserNotes.ToListAsync();
@@ -34,6 +41,11 @@ namespace PregnancyGrowthTracking.DAL.Repositories
         {
             _context.UserNotes.Update(note);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync(); // Lưu thay đổi vào database
         }
 
         public async Task DeleteAsync(int noteId)

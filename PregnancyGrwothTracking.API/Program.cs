@@ -8,7 +8,6 @@ using PregnancyGrowthTracking.BLL.Services;
 using PregnancyGrowthTracking.BLL.Services.Vnpay;
 using PregnancyGrowthTracking.DAL;
 using PregnancyGrowthTracking.DAL.Repositories;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Configuration;
 using Amazon.S3;
 using Amazon;

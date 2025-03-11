@@ -23,17 +23,20 @@ namespace PregnancyGrowthTracking.DAL.Repositories
             await _dbContext.SaveChangesAsync();
             return foetus;
         }
+
         public async Task<bool> IsFoetusNameExistsAsync(int userId, string name)
         {
             return await _dbContext.Foetus
                 .AnyAsync(f => f.UserId == userId && f.Name == name);
         }
+
         public async Task<IEnumerable<Foetus>> GetFoetusesByUserIdAsync(int userId)
         {
             return await _dbContext.Foetus
                 .Where(f => f.UserId == userId)
                 .ToListAsync();
         }
+
         public async Task<Foetus?> GetFoetusByIdAsync(int foetusId)
         {
             return await _dbContext.Foetus
@@ -57,6 +60,7 @@ namespace PregnancyGrowthTracking.DAL.Repositories
 
             return await _dbContext.SaveChangesAsync() > 0;
         }
+
         public async Task<bool> UpdateExpectedBirthDateAsync(int foetusId, DateTime expectedBirthDate)
         {
             var foetus = await _dbContext.Foetus.FirstOrDefaultAsync(f => f.FoetusId == foetusId);
@@ -66,20 +70,14 @@ namespace PregnancyGrowthTracking.DAL.Repositories
             return await _dbContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> UpdateGestationalAgeAsync(int foetusId, int newGestationalAge)
+        public async Task<bool> UpdateGestationalAgeAsync(int foetusId, int gestationalAge)
         {
-            var foetus = await _dbContext.Foetus.FirstOrDefaultAsync(f => f.FoetusId == foetusId);
-            if (foetus == null) return false;
+            Foetus foetus = await _dbContext.Foetus.FirstOrDefaultAsync(f => f.FoetusId == foetusId);
 
-            // ✅ Chỉ cập nhật nếu GestationalAge đang NULL hoặc nhỏ hơn Age mới nhập
-            if (foetus.GestationalAge == null || foetus.GestationalAge < newGestationalAge)
-            {
-                foetus.GestationalAge = newGestationalAge;
-                return await _dbContext.SaveChangesAsync() > 0;
-            }
-
-            return false;
+            foetus.GestationalAge = gestationalAge;
+            return await _dbContext.SaveChangesAsync() > 0;
         }
+
         public async Task<bool> IsFoetusOwnedByUserAsync(int foetusId, int userId)
         {
             return await _dbContext.Foetus.AnyAsync(f => f.FoetusId == foetusId && f.UserId == userId);

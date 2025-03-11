@@ -13,5 +13,6 @@ namespace PregnancyGrowthTracking.DAL.Repositories
         Task<GrowthDatum?> GetGrowthDataByIdAsync(int growthDataId);
         Task<bool> UpdateGrowthDataAsync(GrowthDatum growthData);
         Task<GrowthDatum?> GetGrowthDataByUserAndAgeAsync(int userId, int age);
+        Task<GrowthDatum?> GetGrowthDataByFoetusIdAndAge(int foetusId, int age);
     }
 }

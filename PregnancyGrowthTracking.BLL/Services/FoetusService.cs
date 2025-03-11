@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -51,6 +52,7 @@ namespace PregnancyGrowthTracking.BLL.Services
                 Gender = createdFoetus.Gender
             };
         }
+
         public async Task<IEnumerable<FoetusResponseDto>> GetFoetusesByUserIdAsync(int userId)
         {
             var foetuses = await _foetusRepository.GetFoetusesByUserIdAsync(userId);
@@ -65,9 +67,20 @@ namespace PregnancyGrowthTracking.BLL.Services
                 GestationalAge = f.GestationalAge
             }).ToList();
         }
+
         public async Task<bool> DeleteFoetusAsync(int foetusId, int userId)
         {
             return await _foetusRepository.DeleteFoetusAsync(foetusId, userId);
+        }
+
+        public async Task AutoGenerateExpectedBirthDate(int foetusId, int age)
+        {
+            await _foetusRepository.UpdateGestationalAgeAsync(foetusId, age);
+
+            int dateAdd = (40 - age) * 7;
+            DateTime expectedBirthDay = DateTime.Now.AddDays(dateAdd);
+
+            await _foetusRepository.UpdateExpectedBirthDateAsync(foetusId, expectedBirthDay);
         }
     }
 

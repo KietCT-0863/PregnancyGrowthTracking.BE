@@ -7,10 +7,16 @@ namespace PregnancyGrowthTracking.BLL.Services
 {
     public interface IGrowthDataService
     {
-        Task<bool> AddGrowthDataAsync(int foetusId, GrowthDataCreateDto request);
+        Task<bool> IsAddOrUpdate(int foetusId, int userId, GrowthDataDto request);
+
+        Task<bool> AddGrowthDataAsync(int foetusId, GrowthDataDto request);
+
         Task<IEnumerable<GrowthDataResponseDto>> GetGrowthDataByFoetusIdAsync(int foetusId, int userId);
 
-        Task<bool> UpdateGrowthDataAsync(int userId, GrowthDataUpdateDto request);
+        Task<bool> UpdateGrowthDataAsync(int userId, GrowthDataDto request);
+
+        Task<Dictionary<string, GrowthDataAlertDTO>> AlertReturnWithRange(GrowthDataDto growthData);
+
     }
 }
 

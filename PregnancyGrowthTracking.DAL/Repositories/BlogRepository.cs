@@ -11,11 +11,15 @@ namespace PregnancyGrowthTracking.DAL.Repositories
 {
     public class BlogRepository : IBlogRepository
     {
-        private PregnancyGrowthTrackingDbContext _dbContext;
+        private readonly PregnancyGrowthTrackingDbContext _dbContext;
+
+        public BlogRepository(PregnancyGrowthTrackingDbContext dbContext)
+        {
+            _dbContext = dbContext; // Khởi tạo _dbContext thông qua constructor injection
+        }
 
         public async Task<bool> AddBlogAsync(Blog blog)
         {
-            _dbContext = new();
             _dbContext.Blog.Add(blog);
             await _dbContext.SaveChangesAsync();
             return true;
@@ -23,34 +27,36 @@ namespace PregnancyGrowthTracking.DAL.Repositories
 
         public async Task<List<Blog>> GetAllBlogWithCateAsync()
         {
-            _dbContext = new();
-            return await _dbContext.Blog.Include(b => b.BlogCates).ThenInclude(bc => bc.Category).ToListAsync();
+            return await _dbContext.Blog
+                .Include(b => b.BlogCates)
+                .ThenInclude(bc => bc.Category)
+                .ToListAsync();
         }
 
         public async Task UpdateBlogAsync(Blog blog)
         {
-            _dbContext = new();
             _dbContext.Blog.Update(blog);
             await _dbContext.SaveChangesAsync();
         }
 
         public async Task DeleteBlogAsync(Blog blog)
         {
-            _dbContext = new();
             _dbContext.Blog.Remove(blog);
             await _dbContext.SaveChangesAsync();
         }
 
         public async Task<Blog> GetBlogByIdAsync(int blogId)
         {
-            _dbContext = new();
-            return await _dbContext.Blog.Include(b => b.BlogCates).ThenInclude(bc => bc.Category).FirstOrDefaultAsync(b => b.BlogId == blogId);
+            return await _dbContext.Blog
+                .Include(b => b.BlogCates)
+                .ThenInclude(bc => bc.Category)
+                .FirstOrDefaultAsync(b => b.BlogId == blogId);
         }
 
         public async Task<Blog> GetBlogByTitleAndBodyAsync(string title, string body)
         {
-            _dbContext = new();
-            return await _dbContext.Blog.FirstOrDefaultAsync(b => b.Title == title && b.Body == (body));
+            return await _dbContext.Blog
+                .FirstOrDefaultAsync(b => b.Title == title && b.Body == body);
         }
     }
 }

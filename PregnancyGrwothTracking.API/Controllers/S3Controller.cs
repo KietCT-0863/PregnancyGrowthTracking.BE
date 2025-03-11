@@ -9,19 +9,19 @@ namespace PregnancyGrwothTracking.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class S3Controller : ControllerBase
+    public class ProfileImgController : ControllerBase
     {
         private readonly IS3Service _s3service;
         private readonly IUserService _userService;
 
-        public S3Controller(IS3Service service, IUserService userService)
+        public ProfileImgController(IS3Service service, IUserService userService)
         {
             _s3service = service;
             _userService = userService;
         }
 
         [HttpPut("{userId}/profile-image")]
-        [Authorize(Roles = "admin,member")]
+        [Authorize]
         public async Task<IActionResult> UploadProfileImage(int userId, IFormFile file)
         {
             if (file == null || file.Length == 0)
@@ -37,9 +37,8 @@ namespace PregnancyGrwothTracking.API.Controllers
             return Ok(new { Message = "Cập nhật ảnh đại diện thành công", ImageUrl = imageUrl });
         }
 
-
         [HttpGet("{userId}/files")]
-        [Authorize(Roles = "admin")]
+        [Authorize]
         public async Task<IActionResult> ListFiles(string userId)
         {
             var files = await _s3service.ListFilesAsync($"{userId}/");
@@ -48,7 +47,7 @@ namespace PregnancyGrwothTracking.API.Controllers
         }
 
         [HttpGet("{userId}/profile-image")]
-        [Authorize(Roles = "admin")]
+        [Authorize]
         public async Task<IActionResult> GetUserProfileImage(int userId)
         {
             // ✅ Lấy ảnh từ UserService

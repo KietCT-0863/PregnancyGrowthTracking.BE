@@ -13,5 +13,6 @@ namespace PregnancyGrowthTracking.BLL.Services
         Task<FoetusResponseDto> CreateFoetusAsync(int userId, FoetusCreateDto request);
         Task<IEnumerable<FoetusResponseDto>> GetFoetusesByUserIdAsync(int userId);
         Task<bool> DeleteFoetusAsync(int userId, int foetusId);
+        Task AutoGenerateExpectedBirthDate(int foetusId, int age);
     }
 }

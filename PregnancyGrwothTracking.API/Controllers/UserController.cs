@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PregnancyGrowthTracking.BLL.Services;
 using PregnancyGrowthTracking.DAL.DTOs;
+using PregnancyGrowthTracking.DAL.Entities;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -13,10 +15,12 @@ namespace PregnancyGrowthTracking.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly PregnancyGrowthTrackingDbContext _dbContext;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, PregnancyGrowthTrackingDbContext context)
         {
             _userService = userService;
+            _dbContext = context;
         }
 
         //  Get all users (Chỉ Admin mới có quyền truy cập)
@@ -113,8 +117,74 @@ namespace PregnancyGrowthTracking.API.Controllers
             return Ok(users);
         }
 
+        //Đếm tổng số user có trong hệ thống trừ admin
+        [HttpGet("count-total-users")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> CountUsersByRole()
+        {
+            try
+            {
+                var countRole2 = await _dbContext.Users.CountAsync(u => u.RoleId == 2);
+                var countRole3 = await _dbContext.Users.CountAsync(u => u.RoleId == 3);
 
+                var totalUsers = countRole2 + countRole3;
+
+                return Ok(new
+                {
+                    TotalUsers = totalUsers
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while counting users: {ex.Message}");
+            }
+        }
+
+        [HttpGet("monthly-user-count")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> GetMonthlyUserCount()
+        {
+            try
+            {
+                var users = await _dbContext.Users
+                    .Where(u => u.RoleId == 2 || u.RoleId == 3)
+                    .ToListAsync();
+
+                if (!users.Any())
+                    return Ok(new List<object>());
+
+                var minDate = users.Min(u => u.CreatedAt);
+                var maxDate = users.Max(u => u.CreatedAt);
+
+                var allMonths = Enumerable.Range(0, (maxDate.Year - minDate.Year) * 12 + maxDate.Month - minDate.Month + 1)
+                    .Select(offset => new DateTime(minDate.Year, minDate.Month, 1).AddMonths(offset))
+                    .Select(date => new { Year = date.Year, Month = date.Month })
+                    .ToList();
+
+                var monthlyUserCount = allMonths
+                    .GroupJoin(
+                        users.GroupBy(u => new { u.CreatedAt.Year, u.CreatedAt.Month }),
+                        month => month,
+                        userGroup => userGroup.Key,
+                        (month, userGroup) => new
+                        {
+                            Year = month.Year,
+                            Month = month.Month,
+                            MonthlyUsers = userGroup.SelectMany(g => g).Count()
+                        })
+                    .OrderBy(r => r.Year)
+                    .ThenBy(r => r.Month)
+                    .ToList();
+
+                return Ok(monthlyUserCount);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while calculating monthly user count: {ex.Message}");
+            }
+        }
 
 
     }
 }
+

@@ -14,4 +14,5 @@ public partial class Blog
     public string? BlogImageUrl { get; set; }
 
     public virtual ICollection<BlogCate> BlogCates { get; set; } = new List<BlogCate>();
+ 
 }

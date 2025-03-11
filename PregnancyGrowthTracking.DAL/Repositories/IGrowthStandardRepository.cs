@@ -14,9 +14,10 @@ namespace PregnancyGrowthTracking.DAL.Repositories
 
         Task<bool> AddGrowthStandardAsync(GrowthStandard growthStandard);
 
-        Task<GrowthStandard?> GetGrowthStandardByAgeAsync(int? gestationalAge);
+        Task<GrowthStandard> GetGrowthStandardByAgeAsync(int? gestationalAge);
 
         Task<bool> UpdateGrowthStandardAsync(GrowthStandard growthStandard);
+
 
     }
 

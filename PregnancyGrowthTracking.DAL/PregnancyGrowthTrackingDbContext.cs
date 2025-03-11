@@ -257,9 +257,29 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
         {
             entity.HasKey(e => e.RemindId).HasName("PK__UserRemi__C0874AD5B3733051");
 
-            entity.Property(e => e.Notification).HasMaxLength(255);
+            entity.Property(e => e.Title)
+                .IsRequired()
+                .HasMaxLength(255);
 
-            entity.HasOne(d => d.User).WithMany(p => p.UserReminders)
+            entity.Property(e => e.Date)
+                .IsRequired();
+
+            entity.Property(e => e.Time)
+                .HasMaxLength(10);
+
+            entity.Property(e => e.ReminderType)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            entity.Property(e => e.Notification)
+                .IsRequired()
+                .HasMaxLength(500);
+
+            entity.Property(e => e.IsEmailSent)
+                .HasDefaultValue(false);
+
+            entity.HasOne(d => d.User)
+                .WithMany(p => p.UserReminders)
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("FK__UserRemin__UserI__6754599E");
         });

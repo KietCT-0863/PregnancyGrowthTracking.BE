@@ -114,6 +114,11 @@ namespace PregnancyGrwothTracking.API
             builder.Services.AddScoped<IGrowthDataRepository, GrowthDataRepository>();
             builder.Services.AddScoped<IGrowthStandardServices, GrowthStandardServices>();
             builder.Services.AddScoped<IGrowthStandardRepository, GrowthStandardRepository>();
+            builder.Services.AddScoped<IReminderRepository, ReminderRepository>();
+            builder.Services.AddScoped<IReminderService, ReminderService>();
+            builder.Services.AddScoped<IEmailService, EmailService>();
+            builder.Services.AddHostedService<ReminderSchedulerService>();
+
 
 
             builder.Services.AddCors(options =>

@@ -146,19 +146,35 @@ namespace PregnancyGrowthTracking.API.Controllers
         {
             try
             {
-                // Nhóm người dùng theo tháng và năm
-                var monthlyUserCount = await _dbContext.Users
-                    .Where(u => u.RoleId == 2 || u.RoleId == 3) 
-                    .GroupBy(u => new { u.CreatedAt.Year, u.CreatedAt.Month }) // Nhóm theo năm và tháng
-                    .Select(g => new
-                    {
-                        Year = g.Key.Year,
-                        Month = g.Key.Month,
-                        TotalUsers = g.Count()
-                    })
+                var users = await _dbContext.Users
+                    .Where(u => u.RoleId == 2 || u.RoleId == 3)
+                    .ToListAsync();
+
+                if (!users.Any())
+                    return Ok(new List<object>());
+
+                var minDate = users.Min(u => u.CreatedAt);
+                var maxDate = users.Max(u => u.CreatedAt);
+
+                var allMonths = Enumerable.Range(0, (maxDate.Year - minDate.Year) * 12 + maxDate.Month - minDate.Month + 1)
+                    .Select(offset => new DateTime(minDate.Year, minDate.Month, 1).AddMonths(offset))
+                    .Select(date => new { Year = date.Year, Month = date.Month })
+                    .ToList();
+
+                var monthlyUserCount = allMonths
+                    .GroupJoin(
+                        users.GroupBy(u => new { u.CreatedAt.Year, u.CreatedAt.Month }),
+                        month => month,
+                        userGroup => userGroup.Key,
+                        (month, userGroup) => new
+                        {
+                            Year = month.Year,
+                            Month = month.Month,
+                            MonthlyUsers = userGroup.SelectMany(g => g).Count()
+                        })
                     .OrderBy(r => r.Year)
                     .ThenBy(r => r.Month)
-                    .ToListAsync();
+                    .ToList();
 
                 return Ok(monthlyUserCount);
             }

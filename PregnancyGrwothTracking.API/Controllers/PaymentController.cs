@@ -278,19 +278,35 @@ namespace PregnancyGrwothTracking.API.Controllers
         {
             try
             {
-                // Nhóm các thanh toán theo tháng và năm, sau đó tính tổng TotalPrice
-                var monthlyRevenueList = await _dbContext.Payments
-                    .Where(p => p.Date.HasValue) // Lọc các bản ghi có PaymentDate không null
-                    .GroupBy(p => new { p.Date.Value.Year, p.Date.Value.Month }) // Sử dụng Value để truy cập Year và Month
-                    .Select(g => new
-                    {
-                        Year = g.Key.Year,
-                        Month = g.Key.Month,
-                        TotalRevenue = g.Sum(p => p.TotalPrice)
-                    })
+                var payments = await _dbContext.Payments
+                    .Where(p => p.Date.HasValue)
+                    .ToListAsync();
+
+                if (!payments.Any())
+                    return Ok(new List<object>());
+
+                var minDate = payments.Min(p => p.Date.Value);
+                var maxDate = payments.Max(p => p.Date.Value);
+
+                var allMonths = Enumerable.Range(0, (maxDate.Year - minDate.Year) * 12 + maxDate.Month - minDate.Month + 1)
+                    .Select(offset => new DateTime(minDate.Year, minDate.Month, 1).AddMonths(offset))
+                    .Select(date => new { Year = date.Year, Month = date.Month })
+                    .ToList();
+
+                var monthlyRevenueList = allMonths
+                    .GroupJoin(
+                        payments.GroupBy(p => new { p.Date.Value.Year, p.Date.Value.Month }),
+                        month => month,
+                        paymentGroup => paymentGroup.Key,
+                        (month, paymentGroup) => new
+                        {
+                            Year = month.Year,
+                            Month = month.Month,
+                            MonthlyRevenue = paymentGroup.SelectMany(g => g).Sum(p => p.TotalPrice)
+                        })
                     .OrderBy(r => r.Year)
                     .ThenBy(r => r.Month)
-                    .ToListAsync();
+                    .ToList();
 
                 return Ok(monthlyRevenueList);
             }

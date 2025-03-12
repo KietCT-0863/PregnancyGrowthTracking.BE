@@ -53,6 +53,12 @@ namespace PregnancyGrowthTracking.DAL.Repositories
             if (reminder == null)
                 return false; // 🔹 Không tìm thấy hoặc không thuộc về user
 
+            // ✅ Lấy giờ hiện tại theo giờ Việt Nam
+            var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            var nowUtc = DateTime.UtcNow;
+            var nowVietnam = TimeZoneInfo.ConvertTimeFromUtc(nowUtc, vietnamTimeZone);
+            var nowTime = nowVietnam.TimeOfDay;
+
             // ❗ Kiểm tra nếu `Date` nhỏ hơn hôm nay thì báo lỗi
             if (request.Date.HasValue && request.Date.Value.Date < DateTime.UtcNow.Date)
             {
@@ -63,6 +69,24 @@ namespace PregnancyGrowthTracking.DAL.Repositories
             if (!string.IsNullOrWhiteSpace(request.Time) && !Regex.IsMatch(request.Time, @"^(?:[01]\d|2[0-3]):[0-5]\d$"))
             {
                 throw new ArgumentException("Time must be in HH:mm format (24-hour clock).");
+            }
+
+            // ❗ Nếu có thay đổi `Time`, kiểm tra xem có nhỏ hơn hiện tại không
+            if (!string.IsNullOrWhiteSpace(request.Time) && TimeSpan.TryParse(request.Time, out TimeSpan newTime))
+            {
+                if (request.Date.HasValue && request.Date.Value.Date == nowVietnam.Date && newTime <= nowTime)
+                {
+                    throw new ArgumentException($" Lỗi: Giờ {request.Time} không hợp lệ! Hãy nhập thời gian lớn hơn thời gian hiện tại ({nowVietnam:HH:mm}).");
+                }
+            }
+
+            // ❗ Nếu cập nhật `Date` hoặc `Time`, reset `IsEmailSent` để gửi lại email trước 1 tiếng
+            bool isDateChanged = request.Date.HasValue && request.Date.Value.Date != reminder.Date?.Date;
+            bool isTimeChanged = !string.IsNullOrWhiteSpace(request.Time) && request.Time != reminder.Time;
+
+            if (isDateChanged || isTimeChanged)
+            {
+                reminder.IsEmailSent = false;
             }
 
             // ❗ Giữ lại giá trị cũ nếu không nhập dữ liệu mới

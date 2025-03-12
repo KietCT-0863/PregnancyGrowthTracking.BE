@@ -30,6 +30,23 @@ namespace PregnancyGrowthTracking.BLL.Services
             {
                 throw new ArgumentException("Date must be today or in the future.");
             }
+            // ✅ Lấy giờ hiện tại theo giờ Việt Nam
+            var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            var nowUtc = DateTime.UtcNow;
+            var nowVietnam = TimeZoneInfo.ConvertTimeFromUtc(nowUtc, vietnamTimeZone);
+            var nowTime = nowVietnam.TimeOfDay; // Chỉ lấy giờ & phút
+
+            // ✅ Kiểm tra nếu `Time` hợp lệ
+            if (!TimeSpan.TryParse(request.Time, out TimeSpan userTime))
+            {
+                throw new ArgumentException("Lỗi: Định dạng giờ không hợp lệ! Hãy nhập theo định dạng HH:mm.");
+            }
+
+            // 🚫 Không cho phép nhập thời gian nhỏ hơn thời gian hiện tại
+            if (request.Date.HasValue && request.Date.Value.Date == nowVietnam.Date && userTime <= nowTime)
+            {
+                throw new ArgumentException($"Lỗi: Giờ {request.Time} không hợp lệ! Hãy nhập thời gian lớn hơn thời gian hiện tại ({nowVietnam:HH:mm}).");
+            }
 
 
 
@@ -139,7 +156,7 @@ namespace PregnancyGrowthTracking.BLL.Services
                 <p><strong>🗓️ Ngày:</strong> {createdReminder.Date:dd/MM/yyyy}</p>
                 <p><strong>⏰ Giờ:</strong> {createdReminder.Time}</p>
             </div>
-            <a class='button' href='https://your-website.com/reminders/{createdReminder.RemindId}'>📅 Xem chi tiết</a>
+            <a class='button' href='https://pregnancy-growth-tracking.vercel.app/member/calendar{createdReminder.RemindId}'>📅 Xem chi tiết</a>
         </div>
         <p class='footer'>🤰<strong>Pregnancy Growth Tracking</strong> luôn đồng hành cùng bạn trong hành trình làm mẹ!</p>
     </div>

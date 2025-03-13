@@ -16,5 +16,7 @@ namespace PregnancyGrowthTracking.BLL.Services
         Task<string?> GetUserProfileImageAsync(int userId);
         Task<bool> DeleteUserProfileImageAsync(int userId);
         Task<IEnumerable<UserResponseDto>> SearchUsersByKeywordAsync(string keyword);
+        Task<bool> UpdateUserProfileAsync(int userId, UserSelfUpdateDto request);
+        Task<UserProfileResponseDto?> GetUserProfileAsync(int userId);
     }
 }

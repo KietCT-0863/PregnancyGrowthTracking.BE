@@ -17,10 +17,12 @@ namespace PregnancyGrowthTracking.DAL.Repositories
         public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
             return await _dbContext.Users
-                .Include(u => u.Role) 
+                .Where(u => u.Available == true) // Chỉ lấy những user có Available = 1
+                .Include(u => u.Role)
                 .AsNoTracking()
                 .ToListAsync();
         }
+
 
 
         public async Task<User?> GetUserByIdAsync(int id)
@@ -41,18 +43,35 @@ namespace PregnancyGrowthTracking.DAL.Repositories
 
         public async Task<bool> UpdateUserAsync(User user)
         {
-            _dbContext.Users.Update(user);
+            var existingUser = await _dbContext.Users.FindAsync(user.UserId);
+            if (existingUser == null) return false;
+
+            existingUser.RoleId = user.RoleId; // ✅ Cập nhật RoleId trực tiếp trên thực thể đã truy xuất
+            existingUser.UserName = user.UserName;
+            existingUser.FullName = user.FullName;
+            existingUser.Email = user.Email;
+            existingUser.Password = user.Password;
+            existingUser.Dob = user.Dob;
+            existingUser.Phone = user.Phone;
+            existingUser.Available = user.Available;
+
             return await _dbContext.SaveChangesAsync() > 0;
         }
+
+
+
 
         public async Task<bool> DeleteUserAsync(int id)
         {
             var user = await _dbContext.Users.FindAsync(id);
             if (user == null) return false;
 
-            _dbContext.Users.Remove(user);
+            user.Available = false;
+
+            _dbContext.Users.Update(user);
             return await _dbContext.SaveChangesAsync() > 0;
         }
+
 
         public async Task<bool> UserNameExistsAsync(string userName)
         {
@@ -99,6 +118,13 @@ namespace PregnancyGrowthTracking.DAL.Repositories
                 .Where(u => !string.IsNullOrEmpty(u.FullName) &&
                             EF.Functions.Like(u.FullName, $"%{keyword}%"))
                 .ToListAsync();
+        }
+
+        public async Task<User?> GetUserProfileAsync(int userId)
+        {
+            return await _dbContext.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.UserId == userId);
         }
 
 

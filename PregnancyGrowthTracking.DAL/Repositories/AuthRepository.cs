@@ -108,6 +108,12 @@ public class AuthRepository : IAuthRepository
             throw new UnauthorizedAccessException("Invalid username/email or password.");
         }
 
+        // Nếu tài khoản bị khóa (Available = 0)
+        if (user.Available == false)
+        {
+            throw new UnauthorizedAccessException("Cút");
+        }
+
         //  Tạo JWT Token
         string token = GenerateJwtToken(user);
 
@@ -119,9 +125,9 @@ public class AuthRepository : IAuthRepository
             Role = user.Role?.RoleName ?? "User",
             UserId = user.UserId,
             ProfileImageUrl = user.ProfileImageUrl
-
         };
     }
+
 
     private string GenerateJwtToken(User user)
     {

@@ -15,7 +15,7 @@ namespace PregnancyGrowthTracking.DAL.DTOs
         [Required(ErrorMessage = "Full Name is required")]
         [MinLength(4, ErrorMessage = "Full Name must be at least 4 characters")]
         [MaxLength(20, ErrorMessage = "Full Name cannot exceed 20 characters")]
-        [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Full Name can only contain letters and spaces")]
+        [RegularExpression(@"^[\p{L}\s]+$", ErrorMessage = "Full Name can only contain letters and spaces")] 
         public string FullName { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Email is required")]

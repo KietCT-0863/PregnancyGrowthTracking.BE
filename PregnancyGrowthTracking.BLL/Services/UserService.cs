@@ -2,6 +2,7 @@
 using PregnancyGrowthTracking.DAL.Entities;
 using PregnancyGrowthTracking.DAL.Repositories;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -31,11 +32,14 @@ namespace PregnancyGrowthTracking.BLL.Services
                 Phone = u.Phone,
                 ProfileImageUrl = u.ProfileImageUrl,
                 Dob = u.Dob,
-                Available = u.Available ?? false,  
-                RoleId = u.RoleId ?? 0,            
-                Role = u.Role?.RoleName               
+                Available = u.Available ?? false,
+                RoleId = u.RoleId ?? 0,
+                Role = u.Role?.RoleName
             }).ToList();
         }
+
+
+
 
 
         //  Lấy User theo ID
@@ -98,49 +102,73 @@ namespace PregnancyGrowthTracking.BLL.Services
             var user = await _userRepository.GetUserByIdAsync(userId);
             if (user == null)
                 throw new KeyNotFoundException("Không tìm thấy người dùng.");
-            //  Kiểm tra UserName (phải có ít nhất 4 ký tự, không chứa ký tự đặc biệt ngoài "_" và ".")
-            if (!string.IsNullOrWhiteSpace(request.UserName) &&
-                !Regex.IsMatch(request.UserName, @"^(?![_\.])[a-zA-Z0-9._]{4,30}(?<![_\.])$"))
+
+            var errors = new List<string>();
+
+            //  Kiểm tra chỉ khi admin nhập giá trị mới
+            if (!string.IsNullOrWhiteSpace(request.UserName))
             {
-                throw new ArgumentException("Username phải có ít nhất 4 ký tự, không chứa ký tự đặc biệt ngoại trừ _ và không được bắt đầu hoặc kết thúc bằng _ hoặc .");
+                if (request.UserName.Length < 4 || request.UserName.Length > 30)
+                    errors.Add("Username must be between 4 and 30 characters.");
+                if (!Regex.IsMatch(request.UserName, @"^(?![0-9]+$)(?!.*\s)(?!.*[_\.]$)(?!^[_\.])(?!.*[_\.]{2,})[a-zA-Z0-9._]+$"))
+                    errors.Add("Username can only contain letters, numbers, underscores (_), or dots (.) but not at the beginning or end.");
             }
 
-            //  Kiểm tra FullName (không chứa số & ký tự đặc biệt)
-            if (!string.IsNullOrWhiteSpace(request.FullName) && !Regex.IsMatch(request.FullName, @"^[a-zA-Z\s]{4,30}$"))
-                throw new ArgumentException("Họ và tên phải chứa từ 4-30 ký tự, không chứa số hoặc ký tự đặc biệt.");
+            if (!string.IsNullOrWhiteSpace(request.FullName))
+            {
+                if (request.FullName.Length < 4 || request.FullName.Length > 20)
+                    errors.Add("Full Name must be between 4 and 20 characters.");
+                if (!Regex.IsMatch(request.FullName, @"^[\p{L}\s]+$"))
+                    errors.Add("Full Name can only contain letters and spaces.");
+            }
 
-            //  Kiểm tra Email (nếu có cập nhật)
-            if (!string.IsNullOrWhiteSpace(request.Email) && !Regex.IsMatch(request.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
-                throw new ArgumentException("Email không hợp lệ.");
+            if (!string.IsNullOrWhiteSpace(request.Email))
+            {
+                if (!new EmailAddressAttribute().IsValid(request.Email))
+                    errors.Add("Invalid email format.");
+            }
 
-            //  Kiểm tra Password (nếu có cập nhật)
-            if (!string.IsNullOrWhiteSpace(request.Password) && !Regex.IsMatch(request.Password, @"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$"))
-                throw new ArgumentException("Mật khẩu phải có ít nhất 6 ký tự, chứa cả chữ cái và số.");
+            if (!string.IsNullOrWhiteSpace(request.Password))
+            {
+                if (request.Password.Length < 6 || request.Password.Length > 30)
+                    errors.Add("Password must be between 6 and 30 characters.");
+                if (!Regex.IsMatch(request.Password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$"))
+                    errors.Add("Password must contain at least one lowercase letter, one uppercase letter, and one number.");
+            }
 
-            //  Kiểm tra Ngày sinh (nếu có cập nhật)
-            if (request.Dob.HasValue && !Regex.IsMatch(request.Dob.Value.ToString("yyyy/MM/dd"), @"^\d{4}/\d{2}/\d{2}$"))
-                throw new ArgumentException("Ngày sinh phải theo định dạng YYYY/MM/DD.");
+            if (!string.IsNullOrWhiteSpace(request.Phone))
+            {
+                if (!Regex.IsMatch(request.Phone, @"^(0\d{9}|\+84\d{9})$"))
+                    errors.Add("Phone number must be 10 digits and start with 0 or +84.");
+            }
 
-            // Kiểm tra số điện thoại (nếu có cập nhật)
-            if (!string.IsNullOrWhiteSpace(request.Phone) && !Regex.IsMatch(request.Phone, @"^0\d{9}$"))
-                throw new ArgumentException("Số điện thoại phải có 10 chữ số và bắt đầu bằng 0.");
+            if (request.RoleId.HasValue)
+            {
+                var validRoles = new List<int> { 1, 2, 3 }; // Chỉ cho phép RoleId 1, 2, 3
+                if (!validRoles.Contains(request.RoleId.Value))
+                {
+                    errors.Add("RoleId must be between 1 and 3.");
+                }
+            }
 
-            //  Kiểm tra RoleId (nếu có cập nhật)
-            if (request.RoleId.HasValue && (request.RoleId < 1 || request.RoleId > 3))
-                throw new ArgumentException("RoleId phải nằm trong khoảng 1-3.");
+            // Nếu có lỗi validation, trả về lỗi 400
+            if (errors.Count > 0)
+                throw new ValidationException(string.Join("; ", errors));
 
-            //  Cập nhật dữ liệu
-            user.UserName = request.UserName ?? user.UserName;
-            user.FullName = request.FullName ?? user.FullName;
-            user.Email = request.Email ?? user.Email;
-            user.Password = request.Password ?? user.Password;
+            //  Nếu admin không nhập, giữ nguyên dữ liệu cũ
+            user.UserName = !string.IsNullOrWhiteSpace(request.UserName) ? request.UserName : user.UserName;
+            user.FullName = !string.IsNullOrWhiteSpace(request.FullName) ? request.FullName : user.FullName;
+            user.Email = !string.IsNullOrWhiteSpace(request.Email) ? request.Email : user.Email;
+            user.Password = !string.IsNullOrWhiteSpace(request.Password) ? request.Password : user.Password;
             user.Dob = request.Dob ?? user.Dob;
-            user.Phone = request.Phone ?? user.Phone;
+            user.Phone = !string.IsNullOrWhiteSpace(request.Phone) ? request.Phone : user.Phone;
             user.Available = request.Available ?? user.Available;
-            user.RoleId = request.RoleId ?? user.RoleId;
+            user.RoleId = request.RoleId ?? user.RoleId; //  Đảm bảo chỉ cập nhật RoleId nếu hợp lệ
 
             return await _userRepository.UpdateUserAsync(user);
         }
+
+
 
 
         //  Xóa User
@@ -148,6 +176,7 @@ namespace PregnancyGrowthTracking.BLL.Services
         {
             return await _userRepository.DeleteUserAsync(id);
         }
+
 
         public async Task<bool> UpdateUserProfileImageAsync(int userId, string imageUrl)
         {
@@ -188,6 +217,85 @@ namespace PregnancyGrowthTracking.BLL.Services
                 RoleId = u.RoleId ?? 0,
                 Role = u.Role?.RoleName
             }).ToList();
+        }
+
+        //Update profile by User
+        public async Task<bool> UpdateUserProfileAsync(int userId, UserSelfUpdateDto request)
+        {
+            var user = await _userRepository.GetUserProfileAsync(userId);
+            if (user == null)
+                throw new KeyNotFoundException("User not found.");
+
+            var errors = new List<string>();
+
+            // Kiểm tra chỉ khi user nhập giá trị mới
+            if (!string.IsNullOrWhiteSpace(request.UserName))
+            {
+                if (request.UserName.Length < 4 || request.UserName.Length > 30)
+                    errors.Add("Username must be between 4 and 30 characters.");
+                if (!Regex.IsMatch(request.UserName, @"^(?![0-9]+$)(?!.*\s)(?!.*[_\.]$)(?!^[_\.])(?!.*[_\.]{2,})[a-zA-Z0-9._]+$"))
+                    errors.Add("Username can only contain letters, numbers, underscores (_), or dots (.) but not at the beginning or end.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.FullName))
+            {
+                if (request.FullName.Length < 4 || request.FullName.Length > 20)
+                    errors.Add("Full Name must be between 4 and 20 characters.");
+                if (!Regex.IsMatch(request.FullName, @"^[\p{L}\s]+$"))
+                    errors.Add("Full Name can only contain letters and spaces.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.Email))
+            {
+                if (!new EmailAddressAttribute().IsValid(request.Email))
+                    errors.Add("Invalid email format.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.Password))
+            {
+                if (request.Password.Length < 6 || request.Password.Length > 30)
+                    errors.Add("Password must be between 6 and 30 characters.");
+                if (!Regex.IsMatch(request.Password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$"))
+                    errors.Add("Password must contain at least one lowercase letter, one uppercase letter, and one number.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.Phone))
+            {
+                if (!Regex.IsMatch(request.Phone, @"^0[0-9]{9}$"))
+                    errors.Add("Phone number must be 10 digits and start with 0.");
+            }
+
+            // Nếu có lỗi validation, trả về lỗi 400
+            if (errors.Count > 0)
+                throw new ValidationException(string.Join("; ", errors));
+
+            // Nếu user không nhập, giữ nguyên dữ liệu cũ
+            user.UserName = !string.IsNullOrWhiteSpace(request.UserName) ? request.UserName : user.UserName;
+            user.FullName = !string.IsNullOrWhiteSpace(request.FullName) ? request.FullName : user.FullName;
+            user.Email = !string.IsNullOrWhiteSpace(request.Email) ? request.Email : user.Email;
+            user.Password = !string.IsNullOrWhiteSpace(request.Password) ? request.Password : user.Password;
+            user.Dob = request.Dob ?? user.Dob;
+            user.Phone = !string.IsNullOrWhiteSpace(request.Phone) ? request.Phone : user.Phone;
+
+            return await _userRepository.UpdateUserAsync(user);
+        }
+
+        public async Task<UserProfileResponseDto?> GetUserProfileAsync(int userId)
+        {
+            var user = await _userRepository.GetUserProfileAsync(userId);
+            if (user == null)
+                return null;
+
+            return new UserProfileResponseDto
+            {
+                UserId = user.UserId,
+                UserName = user.UserName,
+                FullName = user.FullName,
+                Email = user.Email,
+                Dob = user.Dob,
+                Phone = user.Phone,
+                ProfileImageUrl = user.ProfileImageUrl
+            };
         }
 
     }

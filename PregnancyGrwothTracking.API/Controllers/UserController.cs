@@ -5,6 +5,7 @@ using PregnancyGrowthTracking.BLL.Services;
 using PregnancyGrowthTracking.DAL.DTOs;
 using PregnancyGrowthTracking.DAL.Entities;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -66,6 +67,7 @@ namespace PregnancyGrowthTracking.API.Controllers
 
         //  Update user
         [HttpPut("{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdateDto request)
         {
             try
@@ -73,7 +75,7 @@ namespace PregnancyGrowthTracking.API.Controllers
                 var updated = await _userService.UpdateUserAsync(id, request);
                 return updated ? Ok(new { Message = "Cập nhật người dùng thành công." }) : NotFound("Không tìm thấy người dùng.");
             }
-            catch (ArgumentException ex)
+            catch (ValidationException ex)
             {
                 return BadRequest(new { Message = ex.Message });
             }
@@ -88,14 +90,16 @@ namespace PregnancyGrowthTracking.API.Controllers
         }
 
 
+
         //  Delete user
         [HttpDelete("{id}")]
         [Authorize(Roles = "admin")] // Chỉ Admin mới có quyền xóa user
         public async Task<IActionResult> DeleteUser(int id)
         {
             var deleted = await _userService.DeleteUserAsync(id);
-            return deleted ? Ok(new { Message = "User deleted successfully" }) : NotFound(new { Message = "User not found" });
+            return deleted ? Ok(new { Message = "User has been deactivated." }) : NotFound(new { Message = "User not found." });
         }
+
 
         [HttpGet("search")]
         public async Task<ActionResult<IEnumerable<UserResponseDto>>> SearchUsers([FromQuery] string fullNameOrKeyword)
@@ -182,6 +186,56 @@ namespace PregnancyGrowthTracking.API.Controllers
             {
                 return StatusCode(500, $"An error occurred while calculating monthly user count: {ex.Message}");
             }
+        }
+
+        //Update Profile By User
+        [HttpPut("me")]
+        [Authorize]
+        public async Task<IActionResult> UpdateUserProfile([FromBody] UserSelfUpdateDto request)
+        {
+            var userIdClaim = User.FindFirst("UserId")?.Value;
+
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int requestUserId))
+            {
+                return Unauthorized(new { Message = "Invalid token" });
+            }
+
+            try
+            {
+                var updated = await _userService.UpdateUserProfileAsync(requestUserId, request);
+                return updated ? Ok(new { Message = "Profile updated successfully." }) : NotFound(new { Message = "User not found." });
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Internal server error.", Error = ex.Message });
+            }
+        }
+
+        //Get profile user
+        [HttpGet("me")]
+        [Authorize] // Chỉ user đăng nhập mới có thể xem thông tin cá nhân
+        public async Task<IActionResult> GetUserProfile()
+        {
+            var userIdClaim = User.FindFirst("UserId")?.Value;
+
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int requestUserId))
+            {
+                return Unauthorized(new { Message = "Invalid token" });
+            }
+
+            var userProfile = await _userService.GetUserProfileAsync(requestUserId);
+            if (userProfile == null)
+                return NotFound(new { Message = "Không tìm thấy thông tin người dùng." });
+
+            return Ok(userProfile);
         }
 
 

@@ -33,7 +33,6 @@ namespace PregnancyGrowthTracking.API.Controllers
             return Ok(result);
         }
 
-        //Login
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
         {
@@ -42,11 +41,17 @@ namespace PregnancyGrowthTracking.API.Controllers
                 var response = await _authService.LoginAsync(request);
                 return Ok(response);
             }
-            catch (UnauthorizedAccessException)
+            catch (UnauthorizedAccessException ex)
             {
-                return Unauthorized("Invalid username/email or password.");
+                if (ex.Message == "Cút")
+                {
+                    return Unauthorized(new { message = ex.Message });
+                }
+
+                return Unauthorized(new { message = "Invalid username/email or password." });
             }
         }
+
         //login with google
         [HttpPost("signin-google")]
         public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequestDto request)

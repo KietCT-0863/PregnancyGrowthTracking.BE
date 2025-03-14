@@ -124,7 +124,8 @@ public class AuthRepository : IAuthRepository
             Email = user.Email,
             Role = user.Role?.RoleName ?? "User",
             UserId = user.UserId,
-            ProfileImageUrl = user.ProfileImageUrl
+            ProfileImageUrl = user.ProfileImageUrl,
+            FullName = user.FullName
         };
     }
 
@@ -144,7 +145,8 @@ public class AuthRepository : IAuthRepository
         new Claim(JwtRegisteredClaimNames.Sub, user.Email),
         new Claim(JwtRegisteredClaimNames.Name, user.UserName),
         new Claim(ClaimTypes.Role, user.Role?.RoleName ?? "User"),
-        new Claim("UserId", user.UserId.ToString()) // Thêm UserId vào claims
+        new Claim("UserId", user.UserId.ToString()), // Thêm UserId vào claims
+        new Claim("FullName", user.FullName ?? string.Empty) // Thêm FullName vào claims
     };
 
         var token = new JwtSecurityToken(

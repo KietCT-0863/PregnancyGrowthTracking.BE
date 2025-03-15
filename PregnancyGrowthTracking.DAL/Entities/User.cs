@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace PregnancyGrowthTracking.DAL.Entities;
 
@@ -25,18 +24,22 @@ public partial class User
     public int? RoleId { get; set; }
 
     public string? ProfileImageUrl { get; set; }
+
     public DateTime CreatedAt { get; set; }
+
+    public virtual ICollection<CommentLike> CommentLikes { get; set; } = new List<CommentLike>();
+
     public virtual ICollection<Foetus> Foetus { get; set; } = new List<Foetus>();
 
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 
+    public virtual ICollection<PostComment> PostComments { get; set; } = new List<PostComment>();
+
+    public virtual ICollection<PostLike> PostLikes { get; set; } = new List<PostLike>();
+
+    public virtual ICollection<Post> Posts { get; set; } = new List<Post>();
+
     public virtual Role? Role { get; set; }
-
-    public virtual ICollection<UserComment> UserComments { get; set; } = new List<UserComment>();
-
-    public virtual ICollection<UserForum> UserForums { get; set; } = new List<UserForum>();
-
-    public virtual ICollection<UserNote> UserNotes { get; set; } = new List<UserNote>();
 
     public virtual ICollection<UserReminder> UserReminders { get; set; } = new List<UserReminder>();
 }

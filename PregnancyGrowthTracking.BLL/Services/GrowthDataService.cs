@@ -92,9 +92,9 @@ namespace PregnancyGrowthTracking.BLL.Services
             return await _growthDataRepository.AddGrowthDataAsync(growthData);
         }
 
-        public async Task<IEnumerable<GrowthDataResponseDto>> GetGrowthDataByFoetusIdAsync(int foetusId, int userId)
+        public async Task<IEnumerable<GrowthDataWithAlertResponseDto>> GetGrowthDataByFoetusIdAsync(int foetusId, int userId)
         {
-            // ✅ Kiểm tra xem thai nhi có thuộc về mẹ không
+            // Kiểm tra quyền truy cập
             bool isOwnedByUser = await _foetusRepository.IsFoetusOwnedByUserAsync(foetusId, userId);
             if (!isOwnedByUser)
             {
@@ -102,18 +102,63 @@ namespace PregnancyGrowthTracking.BLL.Services
             }
 
             var growthDataList = await _growthDataRepository.GetGrowthDataByFoetusIdAsync(foetusId);
+            var result = new List<GrowthDataWithAlertResponseDto>();
 
-            return growthDataList.Select(gd => new GrowthDataResponseDto
+            foreach (var gd in growthDataList)
             {
-                GrowthDataId = gd.GrowthDataId,
-                Age = gd.Age ?? 0,
-                HC = gd.Hc ?? 0, // ✅ Đảm bảo không bị null
-                AC = gd.Ac ?? 0,
-                FL = gd.Fl ?? 0,
-                EFW = gd.Efw ?? 0,
-                GrowthStandardId = gd.GrowthStandardId ?? 0, // ✅ Ép kiểu cho int?
-                Date = gd.Date.HasValue ? gd.Date.Value.ToString("yyyy-MM-dd") : null
-            }).ToList();
+                // Lấy chuẩn tăng trưởng cho tuổi thai tương ứng
+                var growthStandard = await _growthStandardRepository.GetGrowthStandardByAgeAsync(gd.Age ?? 0);
+                if (growthStandard == null) continue;
+
+                // Tạo DTO cho từng chỉ số với alert
+                var responseDto = new GrowthDataWithAlertResponseDto
+                {
+                    GrowthDataId = gd.GrowthDataId,
+                    Age = gd.Age ?? 0,
+                    //GrowthStandardId = gd.GrowthStandardId,
+                    Date = gd.Date.HasValue ? gd.Date.Value.ToString("yyyy-MM-dd") : null,
+
+                    // Head Circumference (HC)
+                    HC = new GrowthMeasurementWithAlert
+                    {
+                        Value = gd.Hc ?? 0,
+                        MinRange = growthStandard.HcMedian * 0.9,
+                        MaxRange = growthStandard.HcMedian * 1.1,
+                        IsAlert = gd.Hc.Value < growthStandard.HcMedian * 0.9 || gd.Hc.Value > growthStandard.HcMedian * 1.1,
+                    },
+
+                    // Abdominal Circumference (AC)
+                    AC = new GrowthMeasurementWithAlert
+                    {
+                        Value = gd.Ac ?? 0,
+                        MinRange = growthStandard.AcMedian * 0.9 ?? 0,
+                        MaxRange = growthStandard.AcMedian * 1.1 ?? 0,
+                        IsAlert = gd.Ac.Value < growthStandard.AcMedian * 0.9 || gd.Ac.Value > growthStandard.AcMedian * 1.1
+                    },
+
+                    // Femur Length (FL)
+                    FL = new GrowthMeasurementWithAlert
+                    {
+                        Value = gd.Fl ?? 0,
+                        MinRange = growthStandard.FlMedian * 0.9 ?? 0,
+                        MaxRange = growthStandard.FlMedian * 1.1 ?? 0,
+                        IsAlert = gd.Fl.Value < growthStandard.FlMedian * 0.9 || gd.Fl.Value > growthStandard.FlMedian * 1.1
+                    },
+
+                    // Estimated Fetal Weight (EFW)
+                    EFW = new GrowthMeasurementWithAlert
+                    {
+                        Value = gd.Efw ?? 0,
+                        MinRange = growthStandard.EfwMedian * 0.9 ?? 0,
+                        MaxRange = growthStandard.EfwMedian * 1.1 ?? 0,
+                        IsAlert = gd.Efw.Value < growthStandard.EfwMedian * 0.9  || gd.Efw.Value > growthStandard.EfwMedian * 1.1
+                    }
+                };
+
+                result.Add(responseDto);
+            }
+
+            return result.OrderBy(x => x.Age);
         }
 
         public async Task<bool> UpdateGrowthDataAsync(int foetusId, GrowthDataDto request)
@@ -154,7 +199,7 @@ namespace PregnancyGrowthTracking.BLL.Services
 
                 alerts["HC"] = new GrowthDataAlertDTO
                 {
-                    IsAlert = hcRangeMin < growthData.HC.Value && growthData.HC.Value < hcRangeMax,
+                    IsAlert = growthData.HC.Value < hcRangeMin || growthData.HC.Value > hcRangeMax,
                     CurrentValue = growthData.HC.Value,
                     MinRange = hcRangeMin,
                     MaxRange = hcRangeMax
@@ -168,7 +213,7 @@ namespace PregnancyGrowthTracking.BLL.Services
                 double acRangeMax = growthStandard.AcMedian.Value * 1.1;
                 alerts["AC"] = new GrowthDataAlertDTO
                 {
-                    IsAlert = acRangeMin < growthData.AC.Value && growthData.AC.Value < acRangeMax,
+                    IsAlert = growthData.AC.Value < acRangeMin || growthData.AC.Value > acRangeMax,
                     CurrentValue = growthData.AC.Value,
                     MinRange = acRangeMin,
                     MaxRange = acRangeMax
@@ -182,7 +227,7 @@ namespace PregnancyGrowthTracking.BLL.Services
                 double flRangeMax = growthStandard.FlMedian.Value * 1.1;
                 alerts["FL"] = new GrowthDataAlertDTO
                 {
-                    IsAlert = flRangeMin < growthData.FL.Value && growthData.FL.Value < flRangeMax,
+                    IsAlert = growthData.FL.Value < flRangeMin || growthData.FL.Value > flRangeMin,
                     CurrentValue = growthData.FL.Value,
                     MinRange = flRangeMin,
                     MaxRange = flRangeMax
@@ -196,7 +241,7 @@ namespace PregnancyGrowthTracking.BLL.Services
                 double efwRangeMax = growthStandard.EfwMedian.Value * 1.1;
                 alerts["EFW"] = new GrowthDataAlertDTO
                 {
-                    IsAlert = efwRangeMin < growthData.EFW.Value && growthData.EFW.Value < efwRangeMax,
+                    IsAlert = efwRangeMin > growthData.EFW.Value || growthData.EFW.Value > efwRangeMax,
                     CurrentValue = growthData.EFW.Value,
                     MinRange = efwRangeMin,
                     MaxRange = efwRangeMax

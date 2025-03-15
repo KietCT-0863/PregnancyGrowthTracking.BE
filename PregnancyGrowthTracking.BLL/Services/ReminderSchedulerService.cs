@@ -166,7 +166,7 @@ namespace PregnancyGrowthTracking.BLL.Services
 
             <p>Hãy sẵn sàng và đảm bảo bạn không bỏ lỡ!</p>
 
-           <a class='button' href='http://localhost:5173/member/calendar-detail/{reminder.RemindId}'>📅 Xem chi tiết</a>
+           <a class='button' href='https://pregnancy-growth-tracking.vercel.app/member/calendar-detail/{reminder.RemindId}'>📅 Xem chi tiết</a>
         </div>
 
         <p class='footer'>

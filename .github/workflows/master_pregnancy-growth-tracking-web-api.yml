@@ -65,4 +65,5 @@ jobs:
           app-name: 'pregnancy-growth-tracking-web-api'
           slot-name: 'Production'
           package: .
+          startup-command: "dotnet PregnancyGrwothTracking.API.dll"
           

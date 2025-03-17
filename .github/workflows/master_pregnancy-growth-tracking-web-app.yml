@@ -24,10 +24,10 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Build with dotnet
-        run: dotnet build PregnancyGrwothTracking.API/PregnancyGrwothTracking.API.csproj --configuration Release
+        run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish PregnancyGrwothTracking.API/PregnancyGrwothTracking.API.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -54,9 +54,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_3EB49F8A7A4E465491D54578080952AC }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_A2EC1B19204E483CBD54355590824FE1 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_67D553C7E87F4853BE879AE01CBF0AFB }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_0533A78230D74B609412DEAB8A892A7B }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_514B069B29F4420E99DA88921B49DDD8 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_06FD221F97784896B6F5BF73DD8E86A0 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -65,5 +65,4 @@ jobs:
           app-name: 'pregnancy-growth-tracking-web-app'
           slot-name: 'Production'
           package: .
-          startup-command: "dotnet PregnancyGrwothTracking.API.dll"
           

@@ -302,9 +302,9 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
 
         modelBuilder.Entity<UserNote>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("UserNote");
+            entity.HasKey(e => e.NoteId);
+
+            entity.ToTable("UserNote");
 
             entity.Property(e => e.Detail).HasMaxLength(255);
             entity.Property(e => e.Diagnosis).HasMaxLength(255);

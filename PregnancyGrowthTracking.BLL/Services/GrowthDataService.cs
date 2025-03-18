@@ -227,7 +227,7 @@ namespace PregnancyGrowthTracking.BLL.Services
                 double flRangeMax = growthStandard.FlMedian.Value * 1.1;
                 alerts["FL"] = new GrowthDataAlertDTO
                 {
-                    IsAlert = growthData.FL.Value < flRangeMin || growthData.FL.Value > flRangeMin,
+                    IsAlert = growthData.FL.Value < flRangeMin || growthData.FL.Value > flRangeMax,
                     CurrentValue = growthData.FL.Value,
                     MinRange = flRangeMin,
                     MaxRange = flRangeMax

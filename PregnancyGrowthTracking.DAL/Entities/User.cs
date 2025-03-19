@@ -43,7 +43,4 @@ public partial class User
 
     public virtual ICollection<UserReminder> UserReminders { get; set; } = new List<UserReminder>();
 
-    public virtual ICollection<Post> Posts { get; set; } = new List<Post>();
-    public virtual ICollection<PostComment> PostComments { get; set; } = new List<PostComment>();
-    public virtual ICollection<CommentLike> CommentLikes { get; set; } = new List<CommentLike>();
 }

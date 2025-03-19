@@ -51,11 +51,6 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
     public virtual DbSet<UserNote> UserNotes { get; set; }
 
     public virtual DbSet<UserReminder> UserReminders { get; set; }
-    public virtual DbSet<Post> Posts { get; set; }
-    public virtual DbSet<PostComment> PostComments { get; set; }
-    public virtual DbSet<CommentLike> CommentLikes { get; set; }
-    public virtual DbSet<Tag> Tags { get; set; }
-    public virtual DbSet<PostTag> PostTags { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseSqlServer(GetConnectionString());
 

@@ -61,6 +61,8 @@ namespace PregnancyGrwothTracking.API
             builder.Services.AddScoped<IPostService, PostService>();
             builder.Services.AddScoped<IPostTagRepository, PostTagRepository>();
             builder.Services.AddScoped<ITagRepository, TagRepository>();
+            builder.Services.AddScoped<IPostLikeRepository, PostLikeRepository>();
+            builder.Services.AddScoped<IPostLikeService, PostLikeService>();
 
 
 

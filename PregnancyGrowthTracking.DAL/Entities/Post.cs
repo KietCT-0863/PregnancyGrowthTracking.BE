@@ -13,10 +13,12 @@ public partial class Post
     
     public string Title { get; set; } = null!;
     public string Body { get; set; } = null!;
-    public string PostTag { get; set; } = null!;
 
     public DateTime CreatedDate { get; set; }
-    public bool IsActive { get; set; }
+
+    public string? PostImageUrl { get; set; }
+
+    public bool IsActive { get; set; } = true;
 
     public virtual User User { get; set; } = null!;
     

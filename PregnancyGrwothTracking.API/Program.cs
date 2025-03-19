@@ -57,6 +57,10 @@ namespace PregnancyGrwothTracking.API
             builder.Services.AddScoped<IVnPayService, VnPayService>();
             builder.Services.AddScoped<IUserNoteRepository, UserNoteRepository>();
             builder.Services.AddScoped<IUserNoteService, UserNoteService>();
+            builder.Services.AddScoped<IPostRepository, PostRepository>();
+            builder.Services.AddScoped<IPostService, PostService>();
+            builder.Services.AddScoped<IPostTagRepository, PostTagRepository>();
+            builder.Services.AddScoped<ITagRepository, TagRepository>();
 
 
 

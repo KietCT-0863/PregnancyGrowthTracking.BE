@@ -17,7 +17,7 @@ namespace PregnancyGrowthTracking.BLL.Services
 
         public async Task<IEnumerable<UserNote>> GetNotesByUserIdAsync(int userId)
         {
-            return await _noteRepository.GetNotesByUserIdAsync(userId); // Gọi phương thức từ repository
+            return await _noteRepository.GetNotesByUserIdAsync(userId); 
         }
 
         public async Task<List<UserNote>> GetAllNotesAsync()
@@ -48,7 +48,7 @@ namespace PregnancyGrowthTracking.BLL.Services
 
         public async Task SaveChangesAsync()
         {
-            await _noteRepository.SaveChangesAsync(); // Lưu thay đổi vào database
+            await _noteRepository.SaveChangesAsync(); 
         }
     }
 }

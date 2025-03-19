@@ -46,6 +46,11 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
     public virtual DbSet<UserNote> UserNotes { get; set; }
 
     public virtual DbSet<UserReminder> UserReminders { get; set; }
+    public virtual DbSet<Post> Posts { get; set; }
+    public virtual DbSet<PostComment> PostComments { get; set; }
+    public virtual DbSet<CommentLike> CommentLikes { get; set; }
+    public virtual DbSet<Tag> Tags { get; set; }
+    public virtual DbSet<PostTag> PostTags { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseSqlServer(GetConnectionString());
 
@@ -283,6 +288,99 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("FK__UserRemin__UserI__6754599E");
         });
+
+        modelBuilder.Entity<Post>(entity =>
+        {
+            entity.HasKey(e => e.PostId).HasName("PK__Post__ID");
+
+            entity.ToTable("Post");
+
+            entity.Property(e => e.Title).HasMaxLength(255).IsRequired();
+            entity.Property(e => e.Body).IsRequired();
+            entity.Property(e => e.CreatedDate).HasDefaultValueSql("GETDATE()");
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+
+            entity.HasOne(d => d.User)
+                .WithMany(u => u.Posts)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK__Post__UserId");
+        });
+
+        // ✅ Cấu hình Tag
+        modelBuilder.Entity<Tag>(entity =>
+        {
+            entity.HasKey(e => e.TagId).HasName("PK__Tag__ID");
+
+            entity.ToTable("Tag");
+
+            entity.Property(e => e.TagName).HasMaxLength(100).IsRequired();
+        });
+
+        // ✅ Cấu hình PostTag (Bảng trung gian giữa Post và Tag)
+        modelBuilder.Entity<PostTag>(entity =>
+        {
+            entity.HasKey(e => e.PostTagId).HasName("PK__PostTag__ID");
+
+            entity.ToTable("PostTag");
+
+            entity.HasOne(d => d.Post)
+                .WithMany(p => p.PostTags)
+                .HasForeignKey(d => d.PostId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK__PostTag__PostId");
+
+            entity.HasOne(d => d.Tag)
+                .WithMany(t => t.PostTags)
+                .HasForeignKey(d => d.TagId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK__PostTag__TagId");
+        });
+
+        // ✅ Cấu hình PostComment (Bình luận trên bài viết)
+        modelBuilder.Entity<PostComment>(entity =>
+        {
+            entity.HasKey(e => e.CommentId).HasName("PK__PostComment__ID");
+
+            entity.ToTable("PostComment");
+
+            entity.Property(e => e.Comment).HasMaxLength(500).IsRequired();
+            entity.Property(e => e.CreatedDate).HasDefaultValueSql("GETDATE()");
+
+            entity.HasOne(d => d.Post)
+                .WithMany(p => p.PostComments)
+                .HasForeignKey(d => d.PostId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK__PostComment__PostId");
+
+            entity.HasOne(d => d.User)
+                .WithMany(u => u.PostComments)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("FK__PostComment__UserId");
+        });
+
+        // ✅ Cấu hình CommentLike (Like trên bình luận)
+        modelBuilder.Entity<CommentLike>(entity =>
+        {
+            entity.HasKey(e => e.CommentLikeId).HasName("PK__CommentLike__ID");
+
+            entity.ToTable("CommentLike");
+
+            entity.HasOne(d => d.Comment)
+                .WithMany(c => c.CommentLikes)
+                .HasForeignKey(d => d.CommentId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK__CommentLike__CommentId");
+
+            entity.HasOne(d => d.User)
+                .WithMany(u => u.CommentLikes)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK__CommentLike__UserId");
+        });
+
+
 
         OnModelCreatingPartial(modelBuilder);
     }

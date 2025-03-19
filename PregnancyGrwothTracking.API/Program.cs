@@ -117,6 +117,10 @@ namespace PregnancyGrwothTracking.API
             builder.Services.AddScoped<IReminderService, ReminderService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddHostedService<ReminderSchedulerService>();
+            builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+            builder.Services.AddScoped<ICommentService, CommentService>();
+            builder.Services.AddScoped<ICommentLikeRepository, CommentLikeRepository>();
+            builder.Services.AddScoped<ICommentLikeService, CommentLikeService>();
 
 
 

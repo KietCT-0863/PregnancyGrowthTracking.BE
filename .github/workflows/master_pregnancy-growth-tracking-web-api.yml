@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - pregnancy-growth-tracking-web-app
+name: Build and deploy ASP.Net Core app to Azure Web App - pregnancy-growth-tracking-web-api
 
 on:
   push:
@@ -24,10 +24,10 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Build with dotnet
-        run: dotnet build PregnancyGrwothTracking.API/PregnancyGrwothTracking.API.csproj --configuration Release
+        run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish PregnancyGrwothTracking.API/PregnancyGrwothTracking.API.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -54,15 +54,15 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_3EB49F8A7A4E465491D54578080952AC }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_A2EC1B19204E483CBD54355590824FE1 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_67D553C7E87F4853BE879AE01CBF0AFB }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_5075202402924DF3A3DDADA7FBB96960 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_90C01B3384454A5784DA36128D72ADD5 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_B04032E2F469495A9F0A900D066F60E4 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'pregnancy-growth-tracking-web-app'
+          app-name: 'pregnancy-growth-tracking-web-api'
           slot-name: 'Production'
           package: .
           startup-command: "dotnet PregnancyGrwothTracking.API.dll"

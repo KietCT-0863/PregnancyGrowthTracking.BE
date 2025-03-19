@@ -4,19 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PregnancyGrowthTracking.DAL.Entities
+namespace PregnancyGrowthTracking.DAL.Entities;
+
+public partial class PostComment
 {
-    public class PostComment
-    {
-        public int CommentId { get; set; }
-        public string Comment { get; set; }
-        public int PostId { get; set; }
-        public int? UserId { get; set; }
-        public DateTime CreatedDate { get; set; }
+    public int CommentId { get; set; }
 
-        public virtual Post Post { get; set; }
-        public virtual User User { get; set; }
-        public virtual ICollection<CommentLike> CommentLikes { get; set; } = new List<CommentLike>();
-    }
+    public string Comment { get; set; } = null!; // Đảm bảo không null
+
+    public int PostId { get; set; }
+
+    public int? UserId { get; set; } // Giữ nullable để tránh lỗi khi UserId có thể rỗng
+
+    public DateTime CreatedDate { get; set; }
+
+    public virtual ICollection<CommentLike> CommentLikes { get; set; } = new List<CommentLike>();
+
+    public virtual Post Post { get; set; } = null!;
+
+    public virtual User? User { get; set; } // Đổi thành `User?` để phù hợp với `UserId?`
 }
-

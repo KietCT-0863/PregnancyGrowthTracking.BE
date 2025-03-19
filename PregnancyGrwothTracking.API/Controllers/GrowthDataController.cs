@@ -49,7 +49,6 @@ namespace PregnancyGrowthTracking.API.Controllers
                 {
                     Message = "Growth data saved successfully.",
                     Alerts = alerts,
-                    //HasWarnings = alerts.Any(x => x.Value.IsAlert)
                 };
 
                 return Ok(response);
@@ -89,25 +88,6 @@ namespace PregnancyGrowthTracking.API.Controllers
             }
         }
 
-        //[HttpPut("update")]
-        //[Authorize]
-        //public async Task<IActionResult> UpdateGrowthData([FromBody] GrowthDataDto request)
-        //{
-        //    var userIdClaim = User.FindFirst("UserId");
-        //    if (userIdClaim == null) return Unauthorized(new { Message = "Unauthorized." });
 
-        //    int userId = int.Parse(userIdClaim.Value);
-
-        //    try
-        //    {
-        //        bool updated = await _growthDataService.UpdateGrowthDataAsync(userId, request);
-        //        return updated ? Ok(new { Message = "Growth data updated successfully." })
-        //                       : NotFound(new { Message = "Growth data not found or access denied." });
-        //    }
-        //    catch (KeyNotFoundException ex)
-        //    {
-        //        return NotFound(new { Message = ex.Message });
-        //    }
-        //}
     }
 }

@@ -11,7 +11,7 @@ namespace PregnancyGrowthTracking.BLL.Services
 
         Task<bool> AddGrowthDataAsync(int foetusId, GrowthDataDto request);
 
-        Task<IEnumerable<GrowthDataResponseDto>> GetGrowthDataByFoetusIdAsync(int foetusId, int userId);
+        Task<IEnumerable<GrowthDataWithAlertResponseDto>> GetGrowthDataByFoetusIdAsync(int foetusId, int userId);
 
         Task<bool> UpdateGrowthDataAsync(int userId, GrowthDataDto request);
 

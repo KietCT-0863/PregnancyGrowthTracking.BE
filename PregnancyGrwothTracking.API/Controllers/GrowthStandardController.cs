@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PregnancyGrowthTracking.BLL.Services;
 using PregnancyGrowthTracking.DAL.DTOs;
+using PregnancyGrowthTracking.DAL.Entities;
 
 namespace PregnancyGrwothTracking.API.Controllers
 {
@@ -17,11 +18,11 @@ namespace PregnancyGrwothTracking.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin,vip")]
         public async Task<IActionResult> GetAllGrowthStandards()
         {
-            var result = await _growthStandardService.GetGrowthStandardsAsync();
-            if (result == null || !result.Any())
+            List<GrowthStandard> result = await _growthStandardService.GetGrowthStandardsAsync();
+            if (result == null)
             {
                 return NotFound("No growth standards found.");
             }

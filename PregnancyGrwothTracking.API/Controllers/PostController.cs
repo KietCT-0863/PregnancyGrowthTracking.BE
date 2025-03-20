@@ -9,6 +9,7 @@ using PregnancyGrowthTracking.DAL.Entities;
 using PregnancyGrowthTracking.DAL.Repositories;
 using Amazon;
 using System.Security.Claims;
+using System;
 
 namespace PregnancyGrowthTracking.API.Controllers
 {
@@ -96,8 +97,14 @@ namespace PregnancyGrowthTracking.API.Controllers
                     return NotFound(new { message = $"Không tìm thấy post với id: {postDTO.Id}" });
                 }
 
-                // 3. Kiểm tra quyền - chỉ admin hoặc người tạo bài viết mới được sửa
-                var currentUserId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+                // 3. Kiểm tra UserId từ token
+                var userIdClaim = User.FindFirst("UserId")?.Value;
+                if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int currentUserId))
+                {
+                    return Unauthorized(new { message = "Không thể xác định người dùng." });
+                }
+
+                // 4. Kiểm tra quyền - chỉ admin hoặc người tạo bài viết mới được sửa
                 var isAdmin = User.IsInRole("admin");
 
                 if (!isAdmin && existingPost.UserId != currentUserId)
@@ -105,23 +112,23 @@ namespace PregnancyGrowthTracking.API.Controllers
                     return StatusCode(403, new { message = "Bạn không có quyền sửa bài viết này" });
                 }
 
-                // 4. Validate tags
+                // 5. Validate tags
                 if (postDTO.Tags != null)
                 {
-                    // 4.1 Kiểm tra số lượng tags
+                    // 5.1 Kiểm tra số lượng tags
                     if (postDTO.Tags.Count > 2)
                     {
                         return BadRequest(new { message = "Chỉ được phép có tối đa 2 tags" });
                     }
 
-                    // 4.2 Kiểm tra tag name rỗng
+                    // 5.2 Kiểm tra tag name rỗng
                     if (postDTO.Tags.Any(t => string.IsNullOrWhiteSpace(t.TagName)))
                     {
                         return BadRequest(new { message = "TagName không được để trống" });
                     }
                 }
 
-                // 5. Validate title và body
+                // 6. Validate title và body
                 if (postDTO.Title != null && string.IsNullOrWhiteSpace(postDTO.Title))
                 {
                     return BadRequest(new { message = "Title không được để trống" });
@@ -132,7 +139,7 @@ namespace PregnancyGrowthTracking.API.Controllers
                     return BadRequest(new { message = "Body không được để trống" });
                 }
 
-                // 6. Thực hiện update
+                // 7. Thực hiện update
                 await _postService.UpdatePostAsync(postDTO);
                 return Ok("Cập nhật post thành công");
             }
@@ -211,7 +218,12 @@ namespace PregnancyGrowthTracking.API.Controllers
                     return NotFound(new { message = $"Không tìm thấy post với id: {postID}" });
                 }
 
-                var currentUserId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+                var userIdClaim = User.FindFirst("UserId")?.Value;
+                if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int currentUserId))
+                {
+                    return Unauthorized(new { message = "Không thể xác định người dùng." });
+                }
+
                 var isAdmin = User.IsInRole("admin");
 
                 if (!isAdmin && existingPost.UserId != currentUserId)
@@ -220,14 +232,15 @@ namespace PregnancyGrowthTracking.API.Controllers
                 }
 
                 await _postService.DeactivatePostAsync(postID);
-                return Ok("Xoá Post thành công.");
+                return Ok(new { message = "Xóa post thành công." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Có lỗi xảy ra khi xoá post: {ex.Message}");
+                return StatusCode(500, new { message = $"Có lỗi xảy ra khi xóa post: {ex.Message}" });
             }
         }
 
+       
         [HttpDelete("tags")]
         [Authorize]
         public async Task<IActionResult> RemoveTagFromPost(int postId, string tagName)
@@ -240,7 +253,13 @@ namespace PregnancyGrowthTracking.API.Controllers
                     return NotFound(new { message = $"Không tìm thấy post với id: {postId}" });
                 }
 
-                var currentUserId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+                var userIdClaim = User.FindFirst("UserId")?.Value;
+                if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int currentUserId))
+                {
+                    return Unauthorized(new { message = "Không thể xác định người dùng." });
+                }
+
+                // Kiểm tra quyền: chỉ admin hoặc chủ bài viết mới có quyền xóa tag
                 var isAdmin = User.IsInRole("admin");
 
                 if (!isAdmin && existingPost.UserId != currentUserId)
@@ -249,11 +268,11 @@ namespace PregnancyGrowthTracking.API.Controllers
                 }
 
                 await _postService.RemoveTagFromPostAsync(postId, tagName);
-                return Ok($"Đã xóa tag '{tagName}' khỏi post thành công");
+                return Ok(new { message = $"Đã xóa tag '{tagName}' khỏi post thành công" });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Có lỗi xảy ra khi xóa tag: {ex.Message}");
+                return StatusCode(500, new { message = $"Có lỗi xảy ra khi xóa tag: {ex.Message}" });
             }
         }
 
@@ -278,6 +297,18 @@ namespace PregnancyGrowthTracking.API.Controllers
                 {
                     return NotFound("Post not found.");
                 }
+
+                var userId = User.FindFirst("UserId")?.Value;
+                if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int parsedUserId))
+                {
+                    return Unauthorized("Cannot determine user.");
+                }
+
+                if (post.UserId != parsedUserId)
+                {
+                    return StatusCode(403, "You do not have permission to edit this post.");
+                }
+
 
                 var photoUrl = await UploadPhotoToS3(file);
 
@@ -312,6 +343,17 @@ namespace PregnancyGrowthTracking.API.Controllers
                 if (post == null)
                 {
                     return NotFound("Post not found.");
+                }
+
+                var userId = User.FindFirst("UserId")?.Value;
+                if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int parsedUserId))
+                {
+                    return Unauthorized("Cannot determine user.");
+                }
+
+                if (post.UserId != parsedUserId)
+                {
+                    return StatusCode(403, "You do not have permission to edit this post.");
                 }
 
                 post.PostImageUrl = null;

@@ -8,9 +8,11 @@ using PregnancyGrowthTracking.DAL.DTOs;
 using PregnancyGrowthTracking.DAL.Entities;
 using PregnancyGrowthTracking.DAL.Repositories;
 using Amazon;
+using System.Security.Claims;
 
 namespace PregnancyGrowthTracking.API.Controllers
 {
+    [Authorize]
     [Route("api/posts")]
     [ApiController]
     public class PostController : ControllerBase
@@ -77,7 +79,6 @@ namespace PregnancyGrowthTracking.API.Controllers
         }
 
         [HttpPut]
-        [Authorize]
         public async Task<IActionResult> UpdatePost([FromBody] UpdatePostDto postDTO)
         {
             try
@@ -149,65 +150,8 @@ namespace PregnancyGrowthTracking.API.Controllers
             }
         }
 
-        //[HttpPut("title")]
-        //public async Task<IActionResult> UpdatePostTitle(int postId, string newTitle)
-        //{
-        //    try
-        //    {
-        //        var updateDto = new UpdatePostDto 
-        //        { 
-        //            Id = postId,
-        //            Title = newTitle
-        //        };
-        //        await _postService.UpdatePostAsync(updateDto);
-        //        return Ok("Cập nhật tiêu đề thành công");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, "Có lỗi xảy ra khi cập nhật tiêu đề");
-        //    }
-        //}
-
-        //[HttpPut("body")]
-        //public async Task<IActionResult> UpdatePostBody(int postId, string newBody)
-        //{
-        //    try
-        //    {
-        //        var updateDto = new UpdatePostDto 
-        //        { 
-        //            Id = postId,
-        //            Body = newBody
-        //        };
-        //        await _postService.UpdatePostAsync(updateDto);
-        //        return Ok("Cập nhật nội dung thành công");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, "Có lỗi xảy ra khi cập nhật nội dung");
-        //    }
-        //}
-
-        //[HttpPut("tags")]
-        //public async Task<IActionResult> UpdatePostTags(int postId, [FromBody] List<UpdatePostDto.UpdatePostTagDTO> tags)
-        //{
-        //    try
-        //    {
-        //        var updateDto = new UpdatePostDto 
-        //        { 
-        //            Id = postId,
-        //            Tags = tags
-        //        };
-        //        await _postService.UpdatePostAsync(updateDto);
-        //        return Ok("Cập nhật tags thành công");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, "Có lỗi xảy ra khi cập nhật tags");
-        //    }
-        //}
-
+       
         [HttpPost]
-        [Authorize]
         public async Task<IActionResult> AddPost([FromBody] CreatePostDto createPostDTO)
         {
             try
@@ -216,7 +160,15 @@ namespace PregnancyGrowthTracking.API.Controllers
                 {
                     return BadRequest(ModelState);
                 }
-                
+
+                var userId = User.FindFirst("UserId")?.Value;
+                if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int parsedUserId))
+                {
+                    return Unauthorized(new { message = "Không thể xác định người dùng." });
+                }
+
+                createPostDTO.UserId = parsedUserId;
+
                 await _postService.AddPostAsync(createPostDTO);
                 return Ok("Thêm post thành công");
             }
@@ -235,7 +187,6 @@ namespace PregnancyGrowthTracking.API.Controllers
         }
 
         [HttpDelete]
-        [Authorize]
         public async Task<IActionResult> DeletePost(int postID)
         {
             try
@@ -269,7 +220,6 @@ namespace PregnancyGrowthTracking.API.Controllers
         }
 
         [HttpDelete("tags")]
-        [Authorize]
         public async Task<IActionResult> RemoveTagFromPost(int postId, string tagName)
         {
             try

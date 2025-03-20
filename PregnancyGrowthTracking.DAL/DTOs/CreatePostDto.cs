@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using static PregnancyGrowthTracking.DAL.DTOs.CreateBlogDTO;
 
@@ -10,8 +11,7 @@ namespace PregnancyGrowthTracking.DAL.DTOs
 {
     public class CreatePostDto
     {
-        [Required(ErrorMessage = "UserId là bắt buộc")]
-        [Range(1, int.MaxValue, ErrorMessage = "UserId phải lớn hơn 0")]
+        [JsonIgnore]
         public int UserId { get; set; }
 
         [Required(ErrorMessage = "Title là bắt buộc")]

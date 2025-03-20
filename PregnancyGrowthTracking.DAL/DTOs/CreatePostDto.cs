@@ -1,19 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-using static PregnancyGrowthTracking.DAL.DTOs.CreateBlogDTO;
+using Microsoft.AspNetCore.Http;
 
 namespace PregnancyGrowthTracking.DAL.DTOs
 {
     public class CreatePostDto
     {
-        [JsonIgnore]
-        public int UserId { get; set; }
-
         [Required(ErrorMessage = "Title là bắt buộc")]
         public string Title { get; set; } = null!;
 
@@ -27,5 +20,6 @@ namespace PregnancyGrowthTracking.DAL.DTOs
         {
             public string TagName { get; set; } = null!;
         }
+        public IFormFile? PostImage { get; set; }
     }
 }

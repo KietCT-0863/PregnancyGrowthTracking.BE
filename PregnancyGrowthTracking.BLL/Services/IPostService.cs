@@ -15,7 +15,7 @@ namespace PregnancyGrowthTracking.BLL.Services
 
         Task UpdatePostAsync(UpdatePostDto postDto);
 
-        Task AddPostAsync(CreatePostDto postDto);
+        Task AddPostAsync(int userId, CreatePostDto postDto);
 
         Task DeletePostAsync(int postID);
 

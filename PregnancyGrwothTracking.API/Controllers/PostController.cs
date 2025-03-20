@@ -12,7 +12,6 @@ using System.Security.Claims;
 
 namespace PregnancyGrowthTracking.API.Controllers
 {
-    [Authorize]
     [Route("api/posts")]
     [ApiController]
     public class PostController : ControllerBase
@@ -79,6 +78,7 @@ namespace PregnancyGrowthTracking.API.Controllers
         }
 
         [HttpPut]
+        [Authorize]
         public async Task<IActionResult> UpdatePost([FromBody] UpdatePostDto postDTO)
         {
             try
@@ -99,7 +99,7 @@ namespace PregnancyGrowthTracking.API.Controllers
                 // 3. Kiểm tra quyền - chỉ admin hoặc người tạo bài viết mới được sửa
                 var currentUserId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
                 var isAdmin = User.IsInRole("admin");
-                
+
                 if (!isAdmin && existingPost.UserId != currentUserId)
                 {
                     return StatusCode(403, new { message = "Bạn không có quyền sửa bài viết này" });
@@ -150,9 +150,10 @@ namespace PregnancyGrowthTracking.API.Controllers
             }
         }
 
-       
+
         [HttpPost]
-        public async Task<IActionResult> AddPost([FromBody] CreatePostDto createPostDTO)
+        [Authorize]
+        public async Task<IActionResult> AddPost([FromForm] CreatePostDto createPostDTO)
         {
             try
             {
@@ -161,15 +162,21 @@ namespace PregnancyGrowthTracking.API.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var userId = User.FindFirst("UserId")?.Value;
-                if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int parsedUserId))
+                // Kiểm tra nếu CreatePostTag có quá 2 tag
+                if (createPostDTO.CreatePostTag != null && createPostDTO.CreatePostTag.Count > 2)
                 {
-                    return Unauthorized(new { message = "Không thể xác định người dùng." });
+                    return BadRequest(new { message = "Chỉ được phép thêm tối đa 2 tags." });
                 }
 
-                createPostDTO.UserId = parsedUserId;
+                var userIdClaim = HttpContext.User.FindFirst("UserId");
+                if (userIdClaim == null)
+                {
+                    return Unauthorized(new { message = "Người dùng chưa đăng nhập." });
+                }
 
-                await _postService.AddPostAsync(createPostDTO);
+                var userId = int.Parse(userIdClaim.Value);
+
+                await _postService.AddPostAsync(userId, createPostDTO);
                 return Ok("Thêm post thành công");
             }
             catch (ArgumentException ex)
@@ -186,7 +193,9 @@ namespace PregnancyGrowthTracking.API.Controllers
             }
         }
 
+
         [HttpDelete]
+        [Authorize]
         public async Task<IActionResult> DeletePost(int postID)
         {
             try
@@ -204,7 +213,7 @@ namespace PregnancyGrowthTracking.API.Controllers
 
                 var currentUserId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
                 var isAdmin = User.IsInRole("admin");
-                
+
                 if (!isAdmin && existingPost.UserId != currentUserId)
                 {
                     return StatusCode(403, new { message = "Bạn không có quyền xóa bài viết này" });
@@ -220,6 +229,7 @@ namespace PregnancyGrowthTracking.API.Controllers
         }
 
         [HttpDelete("tags")]
+        [Authorize]
         public async Task<IActionResult> RemoveTagFromPost(int postId, string tagName)
         {
             try
@@ -232,7 +242,7 @@ namespace PregnancyGrowthTracking.API.Controllers
 
                 var currentUserId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
                 var isAdmin = User.IsInRole("admin");
-                
+
                 if (!isAdmin && existingPost.UserId != currentUserId)
                 {
                     return StatusCode(403, new { message = "Bạn không có quyền chỉnh sửa bài viết này" });
@@ -292,7 +302,7 @@ namespace PregnancyGrowthTracking.API.Controllers
                     return BadRequest("File is required.");
                 }
 
-                const long maxFileSize = 10485760; 
+                const long maxFileSize = 10485760;
                 if (file.Length > maxFileSize)
                 {
                     return BadRequest($"File {file.FileName} exceeds the maximum allowed size of 10 MB.");

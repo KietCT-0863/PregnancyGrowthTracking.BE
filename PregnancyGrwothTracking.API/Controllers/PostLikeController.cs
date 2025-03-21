@@ -1,80 +1,50 @@
 using Microsoft.AspNetCore.Mvc;
 using PregnancyGrowthTracking.BLL.Services;
-using System;
-using System.Collections.Generic;
 using PregnancyGrowthTracking.DAL.DTOs;
+using PregnancyGrowthTracking.DAL.Repositories;
+using System;
 
 namespace PregnancyGrwothTracking.API.Controllers
 {
-    using Microsoft.AspNetCore.Mvc;
-    using PregnancyGrowthTracking.BLL.Services;
-    using System;
-    using System.Threading.Tasks;
-
-    namespace PregnancyGrwothTracking.API.Controllers
-    {
         [ApiController]
         [Route("api/posts")]
         public class PostLikeController : ControllerBase
         {
             private readonly IPostLikeService _postLikeService;
+            private readonly IPostLikeRepository _postLikeRepository;
 
-            public PostLikeController(IPostLikeService postLikeService)
+            public PostLikeController(IPostLikeService postLikeService, IPostLikeRepository postLikeRepository)
             {
                 _postLikeService = postLikeService;
+                _postLikeRepository = postLikeRepository;
             }
 
-            [HttpPost("{postId}/like")]
-            public async Task<IActionResult> LikePost(int postId, [FromBody] LikePostRequest request)
+        [HttpPost("{postId}/toggle-like")]
+        public async Task<IActionResult> ToggleLikePost(int postId)
+        {
+            try
             {
-                try
-                {
-                    if (postId <= 0)
-                        return BadRequest("ID bài viết không hợp lệ");
+                if (postId <= 0)
+                    return BadRequest("ID bài viết không hợp lệ");
 
-                    if (request == null || request.UserId <= 0)
-                        return BadRequest("ID người dùng không hợp lệ");
-
-                    await _postLikeService.LikePostAsync(postId, request.UserId);
-                    int likeCount = await _postLikeService.GetLikesCountAsync(postId);
-                    return Ok(new { Success = true, Message = "Đã thích bài viết", LikeCount = likeCount });
-                }
-                catch (InvalidOperationException ex)
-                {
-                    return BadRequest(ex.Message);
-                }
-                catch (Exception ex)
-                {
-                    return StatusCode(500, $"Lỗi: {ex.Message}");
-                }
+                int likeCount = await _postLikeService.ToggleLikePostAsync(postId, User);
+                return Ok(new { Success = true, Message = "Cập nhật trạng thái thích thành công", LikeCount = likeCount });
             }
-
-            [HttpPost("{postId}/unlike")]
-            public async Task<IActionResult> UnlikePost(int postId, [FromBody] LikePostRequest request)
+            catch (ArgumentException ex)
             {
-                try
-                {
-                    if (postId <= 0)
-                        return BadRequest("ID bài viết không hợp lệ");
-
-                    if (request == null || request.UserId <= 0)
-                        return BadRequest("ID người dùng không hợp lệ");
-
-                    await _postLikeService.UnlikePostAsync(postId, request.UserId);
-                    int likeCount = await _postLikeService.GetLikesCountAsync(postId);
-                    return Ok(new { Success = true, Message = "Đã bỏ thích bài viết", LikeCount = likeCount });
-                }
-                catch (InvalidOperationException ex)
-                {
-                    return BadRequest(ex.Message);
-                }
-                catch (Exception ex)
-                {
-                    return StatusCode(500, $"Lỗi: {ex.Message}");
-                }
+                return NotFound(new { Message = ex.Message });
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Lỗi: {ex.Message}");
+            }
+        }
 
-            [HttpGet("{postId}/likes/count")]
+        [HttpGet("{postId}/likes/count")]
             public async Task<IActionResult> GetLikesCount(int postId)
             {
                 try
@@ -91,7 +61,4 @@ namespace PregnancyGrwothTracking.API.Controllers
                 }
             }
         }
-
-        
-    }
 }

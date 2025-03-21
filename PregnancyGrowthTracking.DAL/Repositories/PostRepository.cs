@@ -58,5 +58,10 @@ namespace PregnancyGrowthTracking.DAL.Repositories
             return await _dbContext.Posts
                 .FirstOrDefaultAsync(b => b.Title == title && b.Body == body);
         }
+
+        public async Task<bool> PostExistsAsync(int postId)
+        {
+            return await _dbContext.Posts.AnyAsync(p => p.PostId == postId);
+        }
     }
 }

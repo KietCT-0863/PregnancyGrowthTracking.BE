@@ -20,5 +20,7 @@ namespace PregnancyGrowthTracking.DAL.Repositories
         Task<Post?> GetPostByIdAsync(int postId);
 
         Task<Post?> GetPostByTitleAndBodyAsync(string title, string body);
+
+        Task<bool> PostExistsAsync(int postId);
     }
 }

@@ -9,5 +9,6 @@ namespace PregnancyGrowthTracking.DAL.Repositories
         Task CreateAsync(PostLike postLike);
         Task DeleteAsync(PostLike postLike);
         Task<int> GetLikesCountAsync(int postId);
+        Task<bool> PostExistsAsync(int postId);
     }
 }

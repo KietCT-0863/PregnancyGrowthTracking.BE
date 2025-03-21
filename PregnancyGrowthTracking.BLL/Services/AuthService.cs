@@ -37,9 +37,9 @@ namespace PregnancyGrowthTracking.BLL.Services
     
     <!-- Icon mẹ bầu -->
     <div style=""text-align: center;"">
-        <img src=""https://i.postimg.cc/cL1H66xt/Logo-bau-02-2.png"" alt=""Pregnant Mom Icon"" width=""120"" style=""margin-bottom: 20px;"" />
+        <img src=""https://i.postimg.cc/cL1H66xt/Logo-bau-02-2.png"" alt=""Pregnant Mom Icon"" width=""80"" style=""margin-bottom: 20px;"" />
     </div>
-    <h2 style=""color: #d63384; text-align: center;""> Xin chào {request.FullName ?? request.Username}!</h2>
+    <h3 style=""color: #d63384; text-align: center;""> Xin chào {request.FullName ?? request.Username}!</h3>
     <p style=""font-size: 14px; color: #333;"">
     Cảm ơn bạn đã đăng ký tài khoản tại <strong>Pregnancy Growth Tracking</strong> 💖.
 </p>

@@ -160,7 +160,7 @@ namespace PregnancyGrowthTracking.API.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> AddPost([FromForm] CreatePostFormDto formDto, [FromForm] CreatePostTagFormDTO listTag)
+        public async Task<IActionResult> AddPost([FromForm] CreatePostFormDto formDto, [FromForm] List<string> tagNames)
         {
             try
             {
@@ -178,23 +178,24 @@ namespace PregnancyGrowthTracking.API.Controllers
                 };
 
                 // Xử lý tags từ form data
-                if (listTag.Tags != null && listTag.Tags.Any())
+                if (tagNames != null && tagNames.Any())
                 {
-                    if (listTag.Tags.Count > 2)
+                    if (tagNames.Count > 2)
                     {
                         return BadRequest(new { message = "Chỉ được phép thêm tối đa 2 tags." });
                     }
 
-                    foreach (var tag in listTag.Tags)
+                    // Kiểm tra tag name rỗng và chuyển đổi thành CreatePostTagDTO
+                    foreach (var tagName in tagNames)
                     {
-                        if (string.IsNullOrWhiteSpace(tag.TagName))
+                        if (string.IsNullOrWhiteSpace(tagName))
                         {
                             return BadRequest(new { message = "TagName không được để trống" });
                         }
 
                         createPostDTO.CreatePostTag.Add(new CreatePostDto.CreatePostTagDTO
                         {
-                            TagName = tag.TagName.Trim()
+                            TagName = tagName.Trim()
                         });
                     }
                 }
@@ -205,7 +206,7 @@ namespace PregnancyGrowthTracking.API.Controllers
                     return Unauthorized(new { message = "Người dùng chưa đăng nhập." });
                 }
 
-                int userId = int.Parse(userIdClaim.Value);
+                var userId = int.Parse(userIdClaim.Value);
 
                 await _postService.AddPostAsync(userId, createPostDTO);
                 return Ok("Thêm post thành công");

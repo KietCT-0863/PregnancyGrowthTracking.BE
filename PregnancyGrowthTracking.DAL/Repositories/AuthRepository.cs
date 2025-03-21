@@ -130,7 +130,7 @@ public class AuthRepository : IAuthRepository
     }
 
 
-    private string GenerateJwtToken(User user)
+    public string GenerateJwtToken(User user)
     {
         var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
 

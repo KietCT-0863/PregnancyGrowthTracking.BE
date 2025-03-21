@@ -10,6 +10,7 @@ using PregnancyGrowthTracking.DAL.Repositories;
 using Amazon;
 using System.Security.Claims;
 using System;
+using System.Text.Json;
 
 namespace PregnancyGrowthTracking.API.Controllers
 {
@@ -157,10 +158,9 @@ namespace PregnancyGrowthTracking.API.Controllers
             }
         }
 
-
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> AddPost([FromForm] CreatePostDto createPostDTO)
+        public async Task<IActionResult> AddPost([FromForm] CreatePostFormDto formDto, [FromForm] CreatePostTagFormDTO listTag)
         {
             try
             {
@@ -169,10 +169,34 @@ namespace PregnancyGrowthTracking.API.Controllers
                     return BadRequest(ModelState);
                 }
 
-                // Kiểm tra nếu CreatePostTag có quá 2 tag
-                if (createPostDTO.CreatePostTag != null && createPostDTO.CreatePostTag.Count > 2)
+                var createPostDTO = new CreatePostDto
                 {
-                    return BadRequest(new { message = "Chỉ được phép thêm tối đa 2 tags." });
+                    Title = formDto.Title,
+                    Body = formDto.Body,
+                    PostImage = formDto.PostImage,
+                    CreatePostTag = new List<CreatePostDto.CreatePostTagDTO>()
+                };
+
+                // Xử lý tags từ form data
+                if (listTag.Tags != null && listTag.Tags.Any())
+                {
+                    if (listTag.Tags.Count > 2)
+                    {
+                        return BadRequest(new { message = "Chỉ được phép thêm tối đa 2 tags." });
+                    }
+
+                    foreach (var tag in listTag.Tags)
+                    {
+                        if (string.IsNullOrWhiteSpace(tag.TagName))
+                        {
+                            return BadRequest(new { message = "TagName không được để trống" });
+                        }
+
+                        createPostDTO.CreatePostTag.Add(new CreatePostDto.CreatePostTagDTO
+                        {
+                            TagName = tag.TagName.Trim()
+                        });
+                    }
                 }
 
                 var userIdClaim = HttpContext.User.FindFirst("UserId");
@@ -181,7 +205,7 @@ namespace PregnancyGrowthTracking.API.Controllers
                     return Unauthorized(new { message = "Người dùng chưa đăng nhập." });
                 }
 
-                var userId = int.Parse(userIdClaim.Value);
+                int userId = int.Parse(userIdClaim.Value);
 
                 await _postService.AddPostAsync(userId, createPostDTO);
                 return Ok("Thêm post thành công");
@@ -240,7 +264,7 @@ namespace PregnancyGrowthTracking.API.Controllers
             }
         }
 
-       
+
         [HttpDelete("tags")]
         [Authorize]
         public async Task<IActionResult> RemoveTagFromPost(int postId, string tagName)

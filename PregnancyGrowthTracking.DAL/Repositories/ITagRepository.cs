@@ -10,6 +10,6 @@ namespace PregnancyGrowthTracking.DAL.Repositories
     public interface ITagRepository
     {
         Task<Tag> GetTagByName(string tagName);
-        Task<int> AddTagAsync(Tag tag);
+        Task AddTagAsync(Tag tag);
     }
 }

@@ -13,24 +13,26 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Amazon;
+using Azure;
+using Tag = PregnancyGrowthTracking.DAL.Entities.Tag;
 
 
 namespace PregnancyGrowthTracking.BLL.Services
 {
     public class PostService : IPostService
     {
+        private readonly IUserRepository _userRepo;
         private readonly IPostRepository _postRepo;
         private readonly IPostTagRepository _postTagRepo;
         private readonly ITagRepository _tagRepo;
-        private readonly PregnancyGrowthTrackingDbContext _context;
         private readonly IConfiguration _configuration;
 
-        public PostService(IPostRepository postRepo, IPostTagRepository postTagRepo, ITagRepository tagRepo, PregnancyGrowthTrackingDbContext context, IConfiguration configuration)
+        public PostService(IUserRepository userRepo, IPostRepository postRepo, IPostTagRepository postTagRepo, ITagRepository tagRepo, PregnancyGrowthTrackingDbContext context, IConfiguration configuration)
         {
+            _userRepo = userRepo;
             _postRepo = postRepo;
             _postTagRepo = postTagRepo;
             _tagRepo = tagRepo;
-            _context = context;
             _configuration = configuration;
         }
 
@@ -57,7 +59,6 @@ namespace PregnancyGrowthTracking.BLL.Services
 
         public async Task UpdatePostAsync(UpdatePostDto postDTO)
         {
-            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
                 // Kiểm tra số lượng tag khi update
@@ -121,12 +122,9 @@ namespace PregnancyGrowthTracking.BLL.Services
                         await _postTagRepo.AddPostTagAsync(postTag);
                     }
                 }
-
-                await transaction.CommitAsync();
             }
             catch (Exception ex)
             {
-                await transaction.RollbackAsync();
                 throw;
             }
         }
@@ -172,104 +170,77 @@ namespace PregnancyGrowthTracking.BLL.Services
 
         public async Task AddPostAsync(int userId, CreatePostDto postDTO)
         {
-            using var transaction = await _context.Database.BeginTransactionAsync();
-            try
+            if (string.IsNullOrEmpty(postDTO.Title) || string.IsNullOrEmpty(postDTO.Body))
             {
-                if (string.IsNullOrEmpty(postDTO.Title) || string.IsNullOrEmpty(postDTO.Body))
-                {
-                    throw new ArgumentException("Title và Body không được để trống");
-                }
+                throw new ArgumentException("Title và Body không được để trống");
+            }
 
-                if (postDTO.CreatePostTag != null && postDTO.CreatePostTag.Count > 2)
-                {
-                    throw new ArgumentException("Chỉ được phép thêm tối đa 2 tags");
-                }
+            if (postDTO.CreatePostTag != null && postDTO.CreatePostTag.Count > 2)
+            {
+                throw new ArgumentException("Chỉ được phép thêm tối đa 2 tags");
+            }
 
-                var userExists = await _context.Users.AnyAsync(u => u.UserId == userId);
-                if (!userExists)
-                {
-                    throw new KeyNotFoundException($"Không tìm thấy user với id: {userId}");
-                }
+            var userExists = await _userRepo.GetUserByIdAsync(userId);
+            if (userExists == null)
+            {
+                throw new KeyNotFoundException($"Không tìm thấy user với id: {userId}");
+            }
 
-                // Upload ảnh nếu có
-                string? postImageUrl = null;
-                if (postDTO.PostImage != null)
-                {
-                    postImageUrl = await UploadPhotoToS3(postDTO.PostImage);
-                }
+            // Upload ảnh nếu có
+            string? postImageUrl = null;
+            if (postDTO.PostImage != null)
+            {
+                postImageUrl = await UploadPhotoToS3(postDTO.PostImage);
+            }
 
-                // Tạo Post mới
-                Post post = new Post
-                {
-                    Title = postDTO.Title,
-                    Body = postDTO.Body,
-                    UserId = userId,
-                    CreatedDate = DateTime.UtcNow,
-                    IsActive = true,
-                    PostImageUrl = postImageUrl
-                };
+            // Tạo Post mới
+            Post post = new Post
+            {
+                Title = postDTO.Title,
+                Body = postDTO.Body,
+                UserId = userId,
+                CreatedDate = DateTime.UtcNow,
+                IsActive = true,
+                PostImageUrl = postImageUrl
+            };
 
-                await _context.Posts.AddAsync(post);
-                await _context.SaveChangesAsync();
+            await _postRepo.AddPostAsync(post);
 
-                if (postDTO.CreatePostTag != null && postDTO.CreatePostTag.Any())
+            // Xử lý tags nếu có
+            if (postDTO.CreatePostTag != null && postDTO.CreatePostTag.Any())
+            {
+                foreach (var tagDto in postDTO.CreatePostTag)
                 {
-                    foreach (var tagDto in postDTO.CreatePostTag)
+                    // Chuẩn hóa tên tag
+                    string normalizedTagName = tagDto.TagName.Trim().ToLower();
+
+                    // Kiểm tra tag đã tồn tại chưa
+                    Tag? existingTag = await _tagRepo.GetTagByName(normalizedTagName);
+                    Tag currentTag;
+
+                    // Nếu tag chưa tồn tại, thêm mới vào bảng Tag
+                    if (existingTag == null)
                     {
-                        if (string.IsNullOrWhiteSpace(tagDto.TagName))
-                        {
-                            continue;
-                        }
-
-                        var normalizedTagName = tagDto.TagName.Trim().ToLower();
-                        var existingTag = await _context.Tags
-                            .FirstOrDefaultAsync(t => EF.Functions.Collate(t.TagName.ToLower(), "SQL_Latin1_General_CP1_CI_AI") == normalizedTagName);
-
-                        DAL.Entities.Tag tag;
-                        if (existingTag == null)
-                        {
-                            tag = new DAL.Entities.Tag
-                            {
-                                TagName = tagDto.TagName.Trim()
-                            };
-                            _context.Tags.Add(tag);
-                            await _context.SaveChangesAsync();
-                        }
-                        else
-                        {
-                            tag = existingTag;
-                        }
-
-                        bool existingPostTag = await _context.PostTags
-                            .AnyAsync(pt => pt.PostId == post.PostId && pt.TagId == tag.TagId);
-
-                        if (!existingPostTag)
-                        {
-                            var postTag = new PostTag
-                            {
-                                PostId = post.PostId,
-                                TagId = tag.TagId
-                            };
-                            _context.PostTags.Add(postTag);
-                        }
+                        currentTag = new Tag { TagName = normalizedTagName };
+                        await _tagRepo.AddTagAsync(currentTag);
                     }
-                    await _context.SaveChangesAsync();
-                }
+                    else
+                    {
+                        currentTag = existingTag;
+                    }
 
-                await transaction.CommitAsync();
-            }
-            catch (DbUpdateException dbEx)
-            {
-                await transaction.RollbackAsync();
-                throw new Exception($"Lỗi khi lưu vào database: {dbEx.InnerException?.Message ?? dbEx.Message}");
-            }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                throw new Exception($"Lỗi khi thêm post: {ex.Message}", ex);
+                    // Tạo liên kết trong bảng PostTag
+                    var postTag = new PostTag
+                    {
+                        PostId = post.PostId,
+                        TagId = currentTag.TagId
+                    };
+
+                    // Lưu vào bảng PostTag
+                    await _postTagRepo.AddPostTagAsync(postTag);
+                }
             }
         }
-
 
         public async Task DeletePostAsync(int postID)
         {
@@ -434,21 +405,18 @@ namespace PregnancyGrowthTracking.BLL.Services
             }
 
             // 3. Tìm và xóa liên kết PostTag
-            var postTag = await _context.PostTags
-                .FirstOrDefaultAsync(pt => pt.PostId == postId && pt.TagId == tag.TagId);
+            PostTag postTag = await _postTagRepo.GetPostTagByPostIdAndTagId(postId, tag.TagId);
 
             if (postTag == null)
             {
                 throw new KeyNotFoundException($"Post không có tag: {tagName}");
             }
 
-            _context.PostTags.Remove(postTag);
-            await _context.SaveChangesAsync();
+            await _postTagRepo.RemovePostTagAsyns(postTag);
         }
 
         public async Task DeactivatePostAsync(int postID)
         {
-            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
                 if (postID < 0)
@@ -467,11 +435,9 @@ namespace PregnancyGrowthTracking.BLL.Services
                 currentPost.IsActive = false;
                 await _postRepo.UpdatePostAsync(currentPost);
 
-                await transaction.CommitAsync();
             }
             catch
             {
-                await transaction.RollbackAsync();
                 throw;
             }
         }

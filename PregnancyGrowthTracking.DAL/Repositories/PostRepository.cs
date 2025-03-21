@@ -14,26 +14,14 @@ namespace PregnancyGrowthTracking.DAL.Repositories
 
         public PostRepository(PregnancyGrowthTrackingDbContext dbContext)
         {
-            _dbContext = dbContext; 
+            _dbContext = dbContext;
         }
 
         public async Task<bool> AddPostAsync(Post post)
         {
-            try
-            {
-                await _dbContext.Posts.AddAsync(post);
-                var result = await _dbContext.SaveChangesAsync();
-                return result > 0;
-            }
-            catch (DbUpdateException ex)
-            {
-                var innerException = ex.InnerException;
-                throw new Exception($"Lỗi khi thêm post vào database: {innerException?.Message ?? ex.Message}", ex);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Lỗi không xác định khi thêm post: {ex.Message}", ex);
-            }
+            await _dbContext.Posts.AddAsync(post);
+            await _dbContext.SaveChangesAsync();
+            return true; 
         }
 
         public async Task<List<Post>> GetAllPostWithTagAsync()
@@ -57,7 +45,7 @@ namespace PregnancyGrowthTracking.DAL.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<Post> GetPostByIdAsync(int postId)
+        public async Task<Post?> GetPostByIdAsync(int postId)
         {
             return await _dbContext.Posts
                 .Include(b => b.PostTags)
@@ -65,7 +53,7 @@ namespace PregnancyGrowthTracking.DAL.Repositories
                 .FirstOrDefaultAsync(b => b.PostId == postId);
         }
 
-        public async Task<Post> GetPostByTitleAndBodyAsync(string title, string body)
+        public async Task<Post?> GetPostByTitleAndBodyAsync(string title, string body)
         {
             return await _dbContext.Posts
                 .FirstOrDefaultAsync(b => b.Title == title && b.Body == body);

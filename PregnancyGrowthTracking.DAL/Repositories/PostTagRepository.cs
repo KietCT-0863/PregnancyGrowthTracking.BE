@@ -1,4 +1,5 @@
-﻿using PregnancyGrowthTracking.DAL.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using PregnancyGrowthTracking.DAL.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,11 @@ namespace PregnancyGrowthTracking.DAL.Repositories
             _dbContext = new();
             _dbContext.PostTags.Remove(postTag);
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<PostTag> GetPostTagByPostIdAndTagId(int postId, int tagId)
+        {
+            return await _dbContext.PostTags.FirstOrDefaultAsync(pt => pt.PostId == postId && pt.TagId == tagId);
         }
     }
 }

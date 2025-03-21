@@ -12,5 +12,6 @@ namespace PregnancyGrowthTracking.DAL.Repositories
         Task AddPostTagAsync(PostTag postTag);
 
         Task RemovePostTagAsyns(PostTag postTag);
+        Task<PostTag> GetPostTagByPostIdAndTagId(int postId, int tagId);
     }
 }

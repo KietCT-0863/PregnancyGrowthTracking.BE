@@ -20,6 +20,7 @@ namespace PregnancyGrowthTracking.DAL.DTOs
         {
             public string TagName { get; set; } = null!;
         }
+
         public IFormFile? PostImage { get; set; }
     }
 }

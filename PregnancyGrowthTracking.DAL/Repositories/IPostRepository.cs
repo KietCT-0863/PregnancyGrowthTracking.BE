@@ -17,8 +17,8 @@ namespace PregnancyGrowthTracking.DAL.Repositories
 
         Task DeletePostAsync(Post post);
 
-        Task<Post> GetPostByIdAsync(int postId);
+        Task<Post?> GetPostByIdAsync(int postId);
 
-        Task<Post> GetPostByTitleAndBodyAsync(string title, string body);
+        Task<Post?> GetPostByTitleAndBodyAsync(string title, string body);
     }
 }

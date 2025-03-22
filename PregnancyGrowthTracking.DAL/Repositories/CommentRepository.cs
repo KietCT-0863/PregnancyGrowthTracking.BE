@@ -27,35 +27,43 @@ namespace PregnancyGrowthTracking.DAL.Repositories
         public async Task<List<CommentResponseDto>> GetAllCommentsAsync()
         {
             return await _dbContext.PostComments
-                .Include(c => c.User) //  Join bảng User để lấy thông tin
-                .Select(c => new CommentResponseDto
-                {
-                    CommentId = c.CommentId,
-                    PostId = c.PostId,
-                    UserId = c.UserId ?? 0, // Nếu `null`, trả về 0
-                    UserName = c.User != null ? c.User.FullName : "Unknown",
-                    Comment = c.Comment,
-                    CreatedDate = c.CreatedDate
-                })
-                .OrderByDescending(c => c.CreatedDate) //  Sắp xếp bình luận mới nhất lên đầu
-                .ToListAsync();
-        }
-        public async Task<List<CommentResponseDto>> GetCommentsByPostIdAsync(int postId)
-        {
-            return await _dbContext.PostComments
-                .Where(c => c.PostId == postId) //  Chỉ lấy bình luận của bài viết này
                 .Include(c => c.User)
                 .Select(c => new CommentResponseDto
                 {
                     CommentId = c.CommentId,
                     PostId = c.PostId,
-                    UserId = c.UserId ?? 0, 
+                    UserId = c.UserId ?? 0,
                     UserName = c.User != null ? c.User.FullName : "Unknown",
                     Comment = c.Comment,
-                    CreatedDate = c.CreatedDate
+                    CreatedDate = c.CreatedDate,
+                    ParentCommentId = c.ParentCommentId,
+                    CommentImageUrl = c.CommentImageUrl
                 })
-                .OrderByDescending(c => c.CreatedDate) //  Sắp xếp mới nhất trước
+                .OrderByDescending(c => c.CreatedDate)
                 .ToListAsync();
+        }
+
+        public async Task<List<CommentResponseDto>> GetCommentsByPostIdAsync(int postId)
+        {
+            var comments = await _dbContext.PostComments
+                .Where(c => c.PostId == postId)
+                .Include(c => c.User)
+                .Include(c => c.Replies) 
+                .ToListAsync();
+
+            
+            return comments.Select(c => new CommentResponseDto
+            {
+                CommentId = c.CommentId,
+                PostId = c.PostId,
+                UserId = c.UserId ?? 0,
+                UserName = c.User?.FullName ?? "Unknown",
+                Comment = c.Comment,
+                CreatedDate = c.CreatedDate,
+                ParentCommentId = c.ParentCommentId,
+                CommentImageUrl = c.CommentImageUrl
+
+            }).OrderByDescending(c => c.CreatedDate).ToList();
         }
         public async Task<PostComment?> GetCommentByIdAsync(int commentId)
         {
@@ -69,9 +77,17 @@ namespace PregnancyGrowthTracking.DAL.Repositories
         }
         public async Task<bool> DeleteCommentAsync(PostComment comment)
         {
+            
+            var replies = await _dbContext.PostComments
+                .Where(c => c.ParentCommentId == comment.CommentId)
+                .ToListAsync();
+
+            _dbContext.PostComments.RemoveRange(replies);
             _dbContext.PostComments.Remove(comment);
+
             return await _dbContext.SaveChangesAsync() > 0;
         }
+
     }
 }
 

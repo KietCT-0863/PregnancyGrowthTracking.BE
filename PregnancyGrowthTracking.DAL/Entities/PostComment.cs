@@ -10,17 +10,26 @@ public partial class PostComment
 {
     public int CommentId { get; set; }
 
-    public string Comment { get; set; } = null!; // Đảm bảo không null
+    public string Comment { get; set; } = null!;
 
     public int PostId { get; set; }
 
-    public int? UserId { get; set; } // Giữ nullable để tránh lỗi khi UserId có thể rỗng
+    public int? UserId { get; set; }
 
     public DateTime CreatedDate { get; set; }
+
+    public string? CommentImageUrl { get; set; }
+
+    // Thêm thuộc tính để hỗ trợ reply
+    public int? ParentCommentId { get; set; }
+
+    public virtual PostComment? ParentComment { get; set; } // Self-reference
+
+    public virtual ICollection<PostComment> Replies { get; set; } = new List<PostComment>(); // Các comment reply
 
     public virtual ICollection<CommentLike> CommentLikes { get; set; } = new List<CommentLike>();
 
     public virtual Post Post { get; set; } = null!;
 
-    public virtual User? User { get; set; } // Đổi thành `User?` để phù hợp với `UserId?`
+    public virtual User? User { get; set; }
 }

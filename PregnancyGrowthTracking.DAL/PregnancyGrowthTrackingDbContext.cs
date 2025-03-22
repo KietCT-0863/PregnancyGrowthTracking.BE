@@ -211,18 +211,31 @@ public partial class PregnancyGrowthTrackingDbContext : DbContext
 
             entity.ToTable("PostComment");
 
+            entity.Property(e => e.Comment).HasMaxLength(500).IsRequired();
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
-            entity.HasOne(d => d.Post).WithMany(p => p.PostComments)
+            
+            entity.HasOne(d => d.Post)
+                .WithMany(p => p.PostComments)
                 .HasForeignKey(d => d.PostId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__PostComme__PostI__02C769E9");
 
-            entity.HasOne(d => d.User).WithMany(p => p.PostComments)
+            
+            entity.HasOne(d => d.User)
+                .WithMany(p => p.PostComments)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__PostComme__UserI__6DCC4D03");
+
+            
+            entity.HasOne(d => d.ParentComment)
+                .WithMany(p => p.Replies)
+                .HasForeignKey(d => d.ParentCommentId)
+                .OnDelete(DeleteBehavior.Cascade) 
+                .HasConstraintName("FK__PostComme__ParentCommentId");
         });
+
 
         modelBuilder.Entity<PostLike>(entity =>
         {

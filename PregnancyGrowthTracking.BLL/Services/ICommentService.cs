@@ -13,7 +13,7 @@ namespace PregnancyGrowthTracking.BLL.Services
         Task<PostComment> CreateCommentAsync(CreateCommentDto request, int userId);
         Task<List<CommentResponseDto>> GetAllCommentsAsync();
         Task<List<CommentResponseDto>> GetCommentsByPostIdAsync(int postId);
-        Task<bool> UpdateCommentAsync(int commentId, int userId, UpdateCommentDto request);
+        Task<bool> UpdateCommentWithImageAsync(int commentId, int userId, UpdateCommentDto request);
         Task<bool> DeleteCommentAsync(int commentId, int userId, bool isAdmin);
     }
 }

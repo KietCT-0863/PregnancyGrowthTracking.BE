@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using PregnancyGrowthTracking.BLL.Services;
 using PregnancyGrowthTracking.DAL.DTOs;
 using PregnancyGrowthTracking.DAL.Entities;
+using PregnancyGrowthTracking.DAL.Repositories;
 
 namespace PregnancyGrwothTracking.API.Controllers
 {
@@ -15,43 +16,59 @@ namespace PregnancyGrwothTracking.API.Controllers
     {
         private readonly ICommentService _commentService;
         private readonly ICommentLikeService _commentLikeService;
+        private readonly IS3Service _s3Service;
+        private readonly ICommentRepository _commentRepository;
 
 
-        public CommentsController(ICommentService commentService, ICommentLikeService commentLikeService)
+
+        public CommentsController(
+     ICommentService commentService,
+     ICommentLikeService commentLikeService,
+     IS3Service s3Service,
+     ICommentRepository commentRepository)
         {
             _commentService = commentService;
             _commentLikeService = commentLikeService;
-
+            _s3Service = s3Service;
+            _commentRepository = commentRepository;
         }
 
 
-        [HttpPost]
-        public async Task<IActionResult> CreateComment([FromBody] CreateCommentDto request)
+
+        [HttpPost("with-image")]
+        [Authorize]
+        public async Task<IActionResult> CreateCommentWithImage([FromForm] CreateCommentDto request)
         {
-            try
-            {
-                //  Lấy UserId từ JWT Claims
-                var userIdClaim = User.FindFirst("UserId")?.Value;
-                if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
-                {
-                    return Unauthorized(new { message = "Invalid User ID from token" });
-                }
+            var userId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+            if (userId == 0)
+                return Unauthorized(new { message = "Bạn chưa đăng nhập!" });
 
-                var createdComment = await _commentService.CreateCommentAsync(request, userId);
+            string? imageUrl = null;
 
-                return Ok(new
-                {
-                    CommentId = createdComment.CommentId,
-                    PostId = createdComment.PostId,
-                    UserId = createdComment.UserId,
-                    Comment = createdComment.Comment,
-                    CreatedDate = createdComment.CreatedDate
-                });
-            }
-            catch (Exception ex)
+            if (request.Image != null && request.Image.Length > 0)
             {
-                return StatusCode(500, new { message = "Lỗi hệ thống", error = ex.Message });
+                // Lưu ảnh vào folder comments/{postId}
+                imageUrl = await _s3Service.UploadFileAsync(request.Image, $"comments/{request.PostId}");
             }
+
+            var newComment = new PostComment
+            {
+                PostId = request.PostId,
+                UserId = userId,
+                Comment = request.Comment,
+                CreatedDate = DateTime.UtcNow,
+                ParentCommentId = request.ParentCommentId,
+                CommentImageUrl = imageUrl
+            };
+
+            await _commentRepository.AddCommentAsync(newComment);
+
+            return Ok(new
+            {
+                Message = "Bình luận đã được tạo thành công",
+                CommentId = newComment.CommentId,
+                ImageUrl = imageUrl
+            });
         }
         [HttpGet]
         public async Task<IActionResult> GetAllComments()
@@ -79,23 +96,20 @@ namespace PregnancyGrwothTracking.API.Controllers
                 return StatusCode(500, new { message = "Lỗi hệ thống", error = ex.Message });
             }
         }
-        [HttpPut("{commentId}")]
-        public async Task<IActionResult> UpdateComment(int commentId, [FromBody] UpdateCommentDto request)
+        [HttpPut("{commentId}/with-image")]
+        public async Task<IActionResult> UpdateCommentWithImage(int commentId, [FromForm] UpdateCommentDto request)
         {
             try
             {
-                //  Lấy UserId từ JWT Token
                 var userId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
-
                 if (userId == 0)
                     return Unauthorized(new { message = "Bạn chưa đăng nhập!" });
 
-                var result = await _commentService.UpdateCommentAsync(commentId, userId, request);
+                var success = await _commentService.UpdateCommentWithImageAsync(commentId, userId, request);
+                if (!success)
+                    return BadRequest(new { message = "Cập nhật thất bại!" });
 
-                if (result)
-                    return Ok(new { message = "Cập nhật bình luận thành công!" });
-
-                return BadRequest(new { message = "Cập nhật thất bại." });
+                return Ok(new { message = "Cập nhật bình luận thành công!" });
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -106,6 +120,7 @@ namespace PregnancyGrwothTracking.API.Controllers
                 return StatusCode(500, new { message = "Lỗi hệ thống", error = ex.Message });
             }
         }
+
         [HttpDelete("{commentId}")]
         public async Task<IActionResult> DeleteComment(int commentId)
         {

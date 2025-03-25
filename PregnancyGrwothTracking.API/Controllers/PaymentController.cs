@@ -33,6 +33,7 @@ namespace PregnancyGrwothTracking.API.Controllers
         }
 
         [HttpPost("create-payment")]
+        [Authorize]
         public async Task<IActionResult> CreatePaymentUrlVnpay([FromBody] PaymentInformationModel model)
         {
             try

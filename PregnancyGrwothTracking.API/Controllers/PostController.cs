@@ -79,6 +79,52 @@ namespace PregnancyGrowthTracking.API.Controllers
             }
         }
 
+        [HttpGet("userid/{id}")]
+        public async Task<ActionResult<List<PostDto>>> GetPostsByUserId(int id)
+        {
+            try
+            {
+                if (id <= 0)
+                {
+                    return BadRequest("Id phải lớn hơn 0");
+                }
+
+                var posts = await _postService.GetPostsByUserIdAsync(id);
+                return Ok(posts);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Lỗi server: {ex.Message}");
+            }
+        }
+
+        
+        [HttpGet("my-posts")]
+        [Authorize]
+        public async Task<ActionResult<List<PostDto>>> GetMyPosts()
+        {
+            try
+            {
+                var userId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+
+                if (userId <= 0)
+                {
+                    return Unauthorized("Không tìm thấy thông tin UserId trong token.");
+                }
+
+                var posts = await _postService.GetPostsByUserIdAsync(userId);
+                return Ok(posts);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Lỗi server: {ex.Message}");
+            }
+        }
+
         [HttpPut]
         [Authorize]
         public async Task<IActionResult> UpdatePost([FromBody] UpdatePostDto postDTO)

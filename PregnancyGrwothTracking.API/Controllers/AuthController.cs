@@ -42,7 +42,6 @@ namespace PregnancyGrowthTracking.API.Controllers
             {
                 var response = await _authService.LoginAsync(request);
                 
-                //// Tạo cookie options
                 //var cookieOptions = new CookieOptions
                 //{
                 //    HttpOnly = true,    // cookies chỉ đc gửi trong HTTP request
@@ -50,6 +49,7 @@ namespace PregnancyGrowthTracking.API.Controllers
                 //};
 
                 //// Lưu token vào cookie
+
                 //Response.Cookies.Append("JWTToken", response.Token, cookieOptions);
 
                 //return Ok(new
@@ -58,7 +58,7 @@ namespace PregnancyGrowthTracking.API.Controllers
                 //    token = response,
                 //});
 
-                return Ok(response);
+                return Ok(response); 
             }
             catch (UnauthorizedAccessException ex)
             {

@@ -2,6 +2,8 @@
 using PregnancyGrowthTracking.BLL.Services;
 using PregnancyGrowthTracking.DAL.DTOs;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using System;
 
 namespace PregnancyGrowthTracking.API.Controllers
 {
@@ -39,7 +41,22 @@ namespace PregnancyGrowthTracking.API.Controllers
             try
             {
                 var response = await _authService.LoginAsync(request);
-                return Ok(response);
+                
+                // Tạo cookie options
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,    // cookies chỉ đc gửi trong HTTP request
+                    Secure = true,      // sử dụng HTTPS
+                };
+
+                // Lưu token vào cookie
+                Response.Cookies.Append("JWTToken", response.Token, cookieOptions);
+
+                return Ok(new
+                {
+                    message = "Login successful",
+                    token = response,
+                });
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -52,6 +69,22 @@ namespace PregnancyGrowthTracking.API.Controllers
             }
         }
 
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            // Xóa cookie JWT token
+            Response.Cookies.Delete("JWTToken", new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+            });
+
+            return Ok(new 
+            { 
+                message = "Đăng xuất thành công",
+            });
+        }
+
         //login with google
         [HttpPost("signin-google")]
         public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequestDto request)
@@ -59,6 +92,19 @@ namespace PregnancyGrowthTracking.API.Controllers
             try
             {
                 var response = await _authService.LoginWithGoogleAsync(request.IdToken);
+                
+                // Tạo cookie options
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTimeOffset.UtcNow.AddHours(1)
+                };
+
+                // Lưu token vào cookie
+                Response.Cookies.Append("JWTToken", response.Token, cookieOptions);
+
                 return Ok(response);
             }
             catch (UnauthorizedAccessException ex)

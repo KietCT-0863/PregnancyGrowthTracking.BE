@@ -30,7 +30,6 @@ namespace PregnancyGrowthTracking.API.Controllers
         }
 
         [HttpGet]
-        [Authorize]
         public async Task<ActionResult<List<PostDto>>> GetAllPosts()
         {
             try
@@ -58,7 +57,6 @@ namespace PregnancyGrowthTracking.API.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize]
         public async Task<ActionResult<PostDto>> GetPost(int id)
         {
             try
@@ -82,7 +80,6 @@ namespace PregnancyGrowthTracking.API.Controllers
         }
 
         [HttpGet("userid/{id}")]
-        [Authorize]
         public async Task<ActionResult<List<PostDto>>> GetPostsByUserId(int id)
         {
             try
@@ -98,6 +95,29 @@ namespace PregnancyGrowthTracking.API.Controllers
             catch (KeyNotFoundException ex)
             {
                 return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Lỗi server: {ex.Message}");
+            }
+        }
+
+        
+        [HttpGet("my-posts")]
+        [Authorize]
+        public async Task<ActionResult<List<PostDto>>> GetMyPosts()
+        {
+            try
+            {
+                var userId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+
+                if (userId <= 0)
+                {
+                    return Unauthorized("Không tìm thấy thông tin UserId trong token.");
+                }
+
+                var posts = await _postService.GetPostsByUserIdAsync(userId);
+                return Ok(posts);
             }
             catch (Exception ex)
             {

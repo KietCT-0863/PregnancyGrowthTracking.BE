@@ -53,6 +53,15 @@ namespace PregnancyGrowthTracking.DAL.Repositories
                 .FirstOrDefaultAsync(b => b.PostId == postId);
         }
 
+        public async Task<List<Post>> GetPostsByUserIdAsync(int userId)
+        {
+            return await _dbContext.Posts
+                .Where(p => p.UserId == userId)
+                .Include(p => p.PostTags)
+                .ThenInclude(pt => pt.Tag)
+                .ToListAsync();
+        }
+
         public async Task<Post?> GetPostByTitleAndBodyAsync(string title, string body)
         {
             return await _dbContext.Posts

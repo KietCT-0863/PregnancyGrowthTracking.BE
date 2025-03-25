@@ -30,6 +30,7 @@ namespace PregnancyGrowthTracking.API.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<List<PostDto>>> GetAllPosts()
         {
             try
@@ -57,6 +58,7 @@ namespace PregnancyGrowthTracking.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<PostDto>> GetPost(int id)
         {
             try
@@ -80,6 +82,7 @@ namespace PregnancyGrowthTracking.API.Controllers
         }
 
         [HttpGet("userid/{id}")]
+        [Authorize]
         public async Task<ActionResult<List<PostDto>>> GetPostsByUserId(int id)
         {
             try

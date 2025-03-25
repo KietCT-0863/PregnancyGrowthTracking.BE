@@ -71,21 +71,21 @@ namespace PregnancyGrowthTracking.API.Controllers
             }
         }
 
-        [HttpPost("logout")]
-        public IActionResult Logout()
-        {
+        //[HttpPost("logout")]
+        //public IActionResult Logout()
+        //{
             // Xóa cookie JWT token
-            Response.Cookies.Delete("JWTToken", new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-            });
+        //    Response.Cookies.Delete("JWTToken", new CookieOptions
+        //    {
+        //        HttpOnly = true,
+        //        Secure = true,
+        //    });
 
-            return Ok(new 
-            { 
-                message = "Đăng xuất thành công",
-            });
-        }
+        //    return Ok(new 
+        //    { 
+        //        message = "Đăng xuất thành công",
+        //    });
+        //}
 
         //login with google
         [HttpPost("signin-google")]

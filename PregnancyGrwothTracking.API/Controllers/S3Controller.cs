@@ -47,7 +47,7 @@ namespace PregnancyGrwothTracking.API.Controllers
         }
 
         [HttpGet("{userId}/profile-image")]
-        [Authorize]
+        
         public async Task<IActionResult> GetUserProfileImage(int userId)
         {
             // ✅ Lấy ảnh từ UserService

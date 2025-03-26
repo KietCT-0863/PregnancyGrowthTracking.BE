@@ -282,5 +282,14 @@ namespace PregnancyGrowthTracking.BLL.Services
         {
             throw new NotImplementedException();
         }
+
+        public async Task<List<CategoryDTO>> GetAllCategory()
+        {
+            var categories = await _cateRepo.GetAllCategory();
+            return categories.Select(c => new CategoryDTO
+            {
+                CategoryName = c.CategoryName
+            }).ToList();
+        }
     }
 }

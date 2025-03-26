@@ -9,6 +9,7 @@ using Amazon;
 using Microsoft.AspNetCore.Http;
 using System;
 using PregnancyGrowthTracking.DAL.Repositories;
+using PregnancyGrowthTracking.DAL.Entities;
 
 namespace PregnancyGrowthTracking.API.Controllers
 {
@@ -215,5 +216,18 @@ namespace PregnancyGrowthTracking.API.Controllers
             return $"https://{bucketName}.s3.amazonaws.com/{fileKey}";
         }
 
+        [HttpGet("categories")]
+        public async Task<IActionResult> GetCategories()
+        {
+            try
+            {
+                List<CategoryDTO> categories = await _blogService.GetAllCategory();
+                return Ok(categories);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Có lỗi xảy ra khi lấy danh sách categories", error = ex.Message });
+            }
+        }
     }
 }

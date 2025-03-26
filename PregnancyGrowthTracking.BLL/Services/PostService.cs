@@ -313,6 +313,22 @@ namespace PregnancyGrowthTracking.BLL.Services
             }).ToList();
         }
 
+        public async Task<PostAuthorDto> GetPostAuthorAsync(int postId)
+        {
+            var post = await _postRepo.GetPostWithAuthorAsync(postId);
+
+            if (post == null || !post.IsActive)
+            {
+                throw new KeyNotFoundException($"Không tìm thấy bài post.");
+            }
+
+            return new PostAuthorDto
+            {
+                FullName = post.User.FullName,
+                ProfileImageUrl = post.User.ProfileImageUrl
+            };
+        }
+
         public async Task RemoveTagFromPostAsync(int postId, string tagName)
         {
             // 1. Kiểm tra post tồn tại

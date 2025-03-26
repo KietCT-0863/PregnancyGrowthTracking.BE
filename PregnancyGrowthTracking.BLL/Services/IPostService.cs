@@ -23,6 +23,8 @@ namespace PregnancyGrowthTracking.BLL.Services
 
         Task<List<PostDto>> GetPostsByUserIdAsync(int userId);
 
+        Task<PostAuthorDto> GetPostAuthorAsync(int postId);
+
         Task RemoveTagFromPostAsync(int postId, string tagName);
 
         Task DeactivatePostAsync(int postID);

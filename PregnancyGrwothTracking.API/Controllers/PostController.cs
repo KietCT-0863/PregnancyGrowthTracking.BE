@@ -125,6 +125,29 @@ namespace PregnancyGrowthTracking.API.Controllers
             }
         }
 
+        [HttpGet("{postId}/author")]
+        public async Task<ActionResult<PostAuthorDto>> GetPostAuthor(int postId)
+        {
+            try
+            {
+                if (postId <= 0)
+                {
+                    return BadRequest("PostId phải lớn hơn 0.");
+                }
+
+                var author = await _postService.GetPostAuthorAsync(postId);
+                return Ok(author);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Lỗi server: {ex.Message}");
+            }
+        }
+
         [HttpPut]
         [Authorize]
         public async Task<IActionResult> UpdatePost([FromBody] UpdatePostDto postDTO)

@@ -41,24 +41,24 @@ namespace PregnancyGrowthTracking.API.Controllers
             try
             {
                 var response = await _authService.LoginAsync(request);
-                
-                //var cookieOptions = new CookieOptions
-                //{
-                //    HttpOnly = true,    // cookies chỉ đc gửi trong HTTP request
-                //    Secure = true,      // sử dụng HTTPS
-                //};
 
-                //// Lưu token vào cookie
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,    // cookies chỉ đc gửi trong HTTP request
+                    Secure = true,      // sử dụng HTTPS
+                };
 
-                //Response.Cookies.Append("JWTToken", response.Token, cookieOptions);
+                // Lưu token vào cookie
 
-                //return Ok(new
-                //{
-                //    message = "Login successful",
-                //    token = response,
-                //});
+                Response.Cookies.Append("JWTToken", response.Token, cookieOptions);
 
-                return Ok(response); 
+                return Ok(new
+                {
+                    message = "Login successful",
+                    //token = response,
+                });
+
+               // return Ok(response); 
             }
             catch (UnauthorizedAccessException ex)
             {

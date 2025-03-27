@@ -42,12 +42,6 @@ namespace PregnancyGrowthTracking.API.Controllers
             {
                 var response = await _authService.LoginAsync(request);
 
-                //var cookieOptions = new CookieOptions
-                //{
-                //    HttpOnly = true,    // cookies chỉ đc gửi trong HTTP request
-                //    Secure = true,      // sử dụng HTTPS
-                //};
-
                 //// Lưu token vào cookie
 
                 //Response.Cookies.Append("JWTToken", response.Token, cookieOptions);

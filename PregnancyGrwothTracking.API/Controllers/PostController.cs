@@ -41,6 +41,7 @@ namespace PregnancyGrowthTracking.API.Controllers
                     posts = posts.Select(p => new ReturnPostDto
                     {
                         Id = p.Id,
+                        UserId = p.UserId,
                         Title = p.Title,
                         Body = p.Body,
                         PostImageUrl = p.PostImageUrl,

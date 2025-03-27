@@ -12,6 +12,7 @@ namespace PregnancyGrowthTracking.DAL.DTOs
         [Required(ErrorMessage = "Post Id is required.")]
         [Range(1, int.MaxValue, ErrorMessage = "Post Id must be greater than or equal to 1.")]
         public int Id { get; set; }
+        public int UserId { get; set; }
 
         public string Title { get; set; } = null!;
         public string Body { get; set; } = null!;

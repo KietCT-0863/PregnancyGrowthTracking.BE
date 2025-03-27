@@ -45,6 +45,7 @@ namespace PregnancyGrowthTracking.BLL.Services
             List<PostDto> listPostDto = listPost.Select(p => new PostDto
             {
                 Id = p.PostId,
+                UserId = p.UserId,
                 Title = p.Title,
                 Body = p.Body,
                 PostImageUrl = p.PostImageUrl,

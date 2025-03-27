@@ -44,7 +44,7 @@ namespace PregnancyGrowthTracking.API.Controllers
 
                 var cookieOptions = new CookieOptions
                 {
-                    HttpOnly = true,    // cookies chỉ đc gửi trong HTTP request
+                    HttpOnly = false,    // cookies chỉ đc gửi trong HTTP request
                     Secure = true,      // sử dụng HTTPS
                 };
 

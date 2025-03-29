@@ -48,6 +48,7 @@ namespace PregnancyGrowthTracking.BLL.Services
                 UserId = p.UserId,
                 Title = p.Title,
                 Body = p.Body,
+                CreatedDate = p.CreatedDate,
                 PostImageUrl = p.PostImageUrl,
                 PostTags = p.PostTags.Select(pt => new PostDto.PostTagDTO
                 {

@@ -45,7 +45,7 @@ namespace PregnancyGrowthTracking.API.Controllers
                         Title = p.Title,
                         Body = p.Body,
                         PostImageUrl = p.PostImageUrl,
-                        CreatedDate = DateTime.Now,
+                        CreatedDate = p.CreatedDate,
                         PostTags = p.PostTags.Select(t => t.TagName).ToList()
                     })
                 };

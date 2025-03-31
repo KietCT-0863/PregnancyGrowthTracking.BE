@@ -72,96 +72,118 @@ namespace PregnancyGrowthTracking.BLL.Services
 
             // ✅ Gửi email ngay lập tức sau khi tạo Reminder
             string subject = $"🔔 Tạo lời nhắc thành công: {createdReminder.Title}";
-
             string body = $@"
 <!DOCTYPE html>
 <html lang='vi'>
 <head>
-    <meta charset='UTF-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>✅ Nhắc Nhở Đã Được Tạo Thành Công!</title>
-    <style>
-        body {{
-            font-family: 'Arial', sans-serif;
-            background-color: #f9f9f9;
-            padding: 20px;
-            margin: 0;
-        }}
-        .email-container {{
-            background-color: #ffffff;
-            max-width: 600px;
-            margin: auto;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            border: 1px solid #e0e0e0;
-        }}
-        .header {{
-            font-size: 24px;
-            font-weight: bold;
-            color: #2E7D32;
-            padding: 15px;
-            background-color: #E8F5E9;
-            border-radius: 10px 10px 0 0;
-        }}
-        .content {{
-            font-size: 16px;
-            color: #444;
-            line-height: 1.6;
-            text-align: left;
-            padding: 15px;
-        }}
-        .info-box {{
-            background-color: #f0f8ff;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-            text-align: left;
-            border-left: 5px solid #2196F3;
-        }}
-        .button {{
-            display: inline-block;
-            background-color: #42A5F5;
-            color: white;
-            padding: 12px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: bold;
-            margin-top: 20px;
-            transition: background 0.3s ease;
-        }}
-        .button:hover {{
-            background-color: #1E88E5;
-        }}
-        .footer {{
-            font-size: 14px;
-            color: #777;
-            padding-top: 20px;
-            border-top: 1px solid #ddd;
-        }}
-    </style>
+  <meta charset='UTF-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <title>✅ Nhắc Nhở Đã Được Tạo Thành Công!</title>
+  <style>
+    body {{
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #ffe6f0; /* Hồng pastel nhạt toàn trang */
+      margin: 0;
+      padding: 0;
+    }}
+    .email-container {{
+      background-color: #fff0f5; /* Nền hồng nhẹ cho nội dung chính */
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      border: 1px solid #f8bbd0;
+    }}
+    .header {{
+      font-size: 22px;
+      font-weight: bold;
+      color: #d81b60;
+      background-color: #fce4ec;
+      padding: 16px;
+      border-radius: 10px 10px 0 0;
+      text-align: center;
+    }}
+    .content {{
+      font-size: 15px;
+      color: #444;
+      line-height: 1.6;
+      padding: 20px;
+      text-align: left;
+    }}
+    .info-box {{
+      background-color: #ffe4f0;
+      padding: 16px;
+      border-radius: 8px;
+      border-left: 5px solid #f06292;
+      margin-top: 12px;
+    }}
+    .info-box p {{
+      margin: 6px 0;
+      color: #333;
+    }}
+    .info-box strong {{
+      color: #c2185b;
+    }}
+    .btn {{
+      display: inline-block;
+      background-color: #e91e63;
+      color: #fff;
+      padding: 12px 20px;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+      margin-top: 20px;
+      transition: background 0.3s ease;
+    }}
+    .btn:hover {{
+      background-color: #c2185b;
+    }}
+    .footer {{
+      font-size: 13px;
+      color: #777;
+      text-align: center;
+      margin-top: 30px;
+      border-top: 1px solid #f8bbd0;
+      padding-top: 15px;
+    }}
+  </style>
 </head>
 <body>
-    <div class='email-container'>
-        <div class='header'>✅ Nhắc Nhở Đã Được Tạo Thành Công!</div>
-        <div class='content'>
-            <p>Xin chào <strong>{user.FullName}</strong>,</p>
-            <p>Bạn vừa tạo một lời nhắc thành công trên hệ thống <strong>Pregnancy Growth Tracking</strong>.</p>
-            <div class='info-box'>
-                <p><strong>📌 Tiêu đề:</strong> {createdReminder.Title}</p>
-                <p><strong>📖 Nội dung:</strong> {createdReminder.Notification}</p>
-                <p><strong>🗂️ Loại nhắc nhở:</strong> {createdReminder.ReminderType}</p>
-                <p><strong>🗓️ Ngày:</strong> {createdReminder.Date:dd/MM/yyyy}</p>
-                <p><strong>⏰ Giờ:</strong> {createdReminder.Time}</p>
-            </div>
-           <a class='button' href='https://pregnancy-growth-tracking.vercel.app/member/calendar-detail/{createdReminder.RemindId}'>📅 Xem chi tiết</a>
-        </div>
-        <p class='footer'>🤰<strong>Pregnancy Growth Tracking</strong> luôn đồng hành cùng bạn trong hành trình làm mẹ!</p>
+  <div class='email-container'>
+    <div class='header'>✅ Nhắc Nhở Đã Được Tạo Thành Công!</div>
+    <div class='content'>
+     <p>👋 Xin chào <strong>{user.FullName}</strong>,</p>
+<p>🙏 Cảm ơn bạn đã sử dụng hệ thống 
+  <span style='display: inline-block; background-color: #f8bbd0; color: #c2185b; padding: 3px 10px; border-radius: 6px; font-weight: bold;'>
+    Pregnancy Growth Tracking
+  </span>.
+</p>
+<p>⏰ Hệ thống sẽ gửi thông báo nhắc nhở đến bạn <strong>trước 1 tiếng</strong>.</p>
+<p>📬 Vui lòng kiểm tra Gmail của bạn để đảm bảo nhận được thông báo đúng lúc nhé!</p>
+
+
+
+      <div class='info-box'>
+        <p><strong>📌 Tiêu đề:</strong> {createdReminder.Title}</p>
+        <p><strong>📖 Nội dung:</strong> {createdReminder.Notification}</p>
+        <p><strong>🗂️ Loại nhắc nhở:</strong> {createdReminder.ReminderType}</p>
+        <p><strong>🗓️ Ngày:</strong> {createdReminder.Date:dd/MM/yyyy}</p>
+        <p><strong>⏰ Giờ:</strong> {createdReminder.Time}</p>
+      </div>
+
+      <a class='btn' href='https://pregnancy-growth-tracking.vercel.app/member/calendar-detail/{createdReminder.RemindId}'>📅 Xem chi tiết</a>
+
+      <p style='margin-top: 20px;'>💖 Hãy tiếp tục cập nhật những cột mốc quan trọng trong hành trình làm mẹ nhé!</p>
     </div>
+    <div class='footer'>
+      🤰 <strong>Pregnancy Growth Tracking</strong> luôn đồng hành cùng bạn trong hành trình làm mẹ!
+    </div>
+  </div>
 </body>
 </html>";
+
+
 
 
 

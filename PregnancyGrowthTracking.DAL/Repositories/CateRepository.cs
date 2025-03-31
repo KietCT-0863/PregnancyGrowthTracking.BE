@@ -10,12 +10,21 @@ namespace PregnancyGrowthTracking.DAL.Repositories
 {
     public class CateRepository : ICateRepository
     {
-        private PregnancyGrowthTrackingDbContext? _dbContext;
+        private PregnancyGrowthTrackingDbContext _dbContext;
 
-        public async Task<Category> GetCategoryByName(string cateName)
+        public CateRepository(PregnancyGrowthTrackingDbContext dbContext)
         {
-            _dbContext = new();
+            _dbContext = dbContext;
+        }
+
+        public async Task<Category?> GetCategoryByName(string cateName)
+        {
             return await _dbContext.Categorie.FirstOrDefaultAsync(c => c.CategoryName == cateName);
+        }
+
+        public async Task<List<Category>> GetAllCategory()
+        {
+            return await _dbContext.Categorie.ToListAsync();
         }
     }
 }

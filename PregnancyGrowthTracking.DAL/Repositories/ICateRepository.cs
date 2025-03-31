@@ -9,6 +9,7 @@ namespace PregnancyGrowthTracking.DAL.Repositories
 {
     public interface ICateRepository
     {
-        Task<Category> GetCategoryByName(string cateName);
+        Task<Category?> GetCategoryByName(string cateName);
+        Task<List<Category>> GetAllCategory();
     }
 }

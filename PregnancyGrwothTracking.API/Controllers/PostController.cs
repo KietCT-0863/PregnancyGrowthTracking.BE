@@ -41,10 +41,11 @@ namespace PregnancyGrowthTracking.API.Controllers
                     posts = posts.Select(p => new ReturnPostDto
                     {
                         Id = p.Id,
+                        UserId = p.UserId,
                         Title = p.Title,
                         Body = p.Body,
                         PostImageUrl = p.PostImageUrl,
-                        CreatedDate = DateTime.Now,
+                        CreatedDate = p.CreatedDate,
                         PostTags = p.PostTags.Select(t => t.TagName).ToList()
                     })
                 };
@@ -118,6 +119,29 @@ namespace PregnancyGrowthTracking.API.Controllers
 
                 var posts = await _postService.GetPostsByUserIdAsync(userId);
                 return Ok(posts);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Lỗi server: {ex.Message}");
+            }
+        }
+
+        [HttpGet("{postId}/author")]
+        public async Task<ActionResult<PostAuthorDto>> GetPostAuthor(int postId)
+        {
+            try
+            {
+                if (postId <= 0)
+                {
+                    return BadRequest("PostId phải lớn hơn 0.");
+                }
+
+                var author = await _postService.GetPostAuthorAsync(postId);
+                return Ok(author);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
             }
             catch (Exception ex)
             {

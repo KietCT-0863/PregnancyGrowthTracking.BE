@@ -45,8 +45,10 @@ namespace PregnancyGrowthTracking.BLL.Services
             List<PostDto> listPostDto = listPost.Select(p => new PostDto
             {
                 Id = p.PostId,
+                UserId = p.UserId,
                 Title = p.Title,
                 Body = p.Body,
+                CreatedDate = p.CreatedDate,
                 PostImageUrl = p.PostImageUrl,
                 PostTags = p.PostTags.Select(pt => new PostDto.PostTagDTO
                 {
@@ -311,6 +313,22 @@ namespace PregnancyGrowthTracking.BLL.Services
                     TagName = pt.Tag.TagName
                 }).ToList()
             }).ToList();
+        }
+
+        public async Task<PostAuthorDto> GetPostAuthorAsync(int postId)
+        {
+            var post = await _postRepo.GetPostWithAuthorAsync(postId);
+
+            if (post == null || !post.IsActive)
+            {
+                throw new KeyNotFoundException($"Không tìm thấy bài post.");
+            }
+
+            return new PostAuthorDto
+            {
+                FullName = post.User.FullName,
+                ProfileImageUrl = post.User.ProfileImageUrl
+            };
         }
 
         public async Task RemoveTagFromPostAsync(int postId, string tagName)

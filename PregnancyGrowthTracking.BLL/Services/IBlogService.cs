@@ -24,5 +24,7 @@ namespace PregnancyGrowthTracking.BLL.Services
         Task UploadPhotoAsync(int blogId, IFormFile file);
 
         Task ReplacePhotoAsync(int blogId, IFormFile file);
+
+        Task<List<CategoryDTO>> GetAllCategory();
     }
 }
